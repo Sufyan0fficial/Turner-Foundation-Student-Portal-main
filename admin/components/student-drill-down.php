@@ -42,17 +42,17 @@ function render_student_drill_down($student_id) {
         $student_id
     ));
     
-    $total_attendance = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_attendance_records WHERE student_id = %d",
-        $student_id
-    ));
+    $total_attendance = 98; // Fixed total sessions out of 98
     
     $present_count = $wpdb->get_var($wpdb->prepare(
-        "SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_attendance_records WHERE student_id = %d AND status = 'present'",
-        $student_id
+        "SELECT (
+            (SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_attendance WHERE student_id = %d AND status IN ('present', 'excused')) +
+            (SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_attendance_records WHERE student_id = %d AND status IN ('present', 'excused'))
+        ) as total_present",
+        $student_id, $student_id
     ));
     
-    $attendance_percentage = $total_attendance > 0 ? round(($present_count / $total_attendance) * 100) : 0;
+    $attendance_percentage = round(($present_count / 98) * 100);
     
     // Get coach sessions
     $coach_sessions = $wpdb->get_results($wpdb->prepare(

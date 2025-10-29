@@ -2,7 +2,11 @@
 if (!defined('ABSPATH')) {
     exit;
 }
-
+// Check if user is logged in, redirect to login if not
+if (!is_user_logged_in()) {
+    wp_redirect(home_url('/student-login/'));
+    exit;
+}
 // Handle coach message form submission (non-AJAX)
 if (isset($_POST['send_coach_message']) && wp_verify_nonce($_POST['coach_nonce'], 'coach_message')) {
     $subject = sanitize_text_field($_POST['coach_subject']);
@@ -153,6 +157,262 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
         
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         
+        /* Header Styles */
+        .dashboard-header { 
+            background: linear-gradient(135deg, #2d5016 0%, #3f5340 100%); 
+            color: white; 
+            padding: 15px 25px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header-content { display: flex; justify-content: space-between; align-items: center; }
+        .header-right { display: flex; gap: 12px; }
+        .dashboard-header h2, .header-left h2 { 
+            color: white !important; 
+            margin: 0 !important; 
+            line-height: 1 !important; 
+            display: flex !important; 
+            align-items: center !important; 
+        }
+        .header-btn { 
+            background: rgba(255,255,255,0.2); 
+            color: white; 
+            border: 1px solid rgba(255,255,255,0.3); 
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            text-decoration: none; 
+            font-size: 14px; 
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .header-btn:hover { 
+            background: rgba(255,255,255,0.3); 
+            color: white; 
+            text-decoration: none;
+        }
+        
+        /* Chat Modal Styles */
+        .chat-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .chat-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 95%;
+            max-width: 700px;
+            height: 85vh;
+            max-height: 700px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            flex-shrink: 0;
+        }
+        .close-chat {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 5px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #2d5016;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .btn-primary {
+            background: #8BC34A;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .btn-primary:hover {
+            background: #7CB342;
+        }
+        
+        /* Message Type Selector */
+        .message-type-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+        .msg-type-btn {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        .msg-type-btn.active {
+            background: #8BC34A;
+            color: white;
+            border-color: #8BC34A;
+        }
+        .msg-type-btn:hover {
+            background: #e0e0e0;
+        }
+        .msg-type-btn.active:hover {
+            background: #7CB342;
+        }
+        
+        /* Message Forms */
+        .message-form {
+            display: none;
+        }
+        .message-form.active {
+            display: block;
+        }
+        
+        /* WhatsApp-like Chat Interface */
+        .chat-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 500px;
+        }
+        .message-history {
+            flex: 1;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            min-height: 300px;
+            max-height: calc(100vh - 300px);
+        }
+        .chat-message {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message.sent {
+            align-items: flex-end;
+        }
+        .chat-message.received {
+            align-items: flex-start;
+        }
+        .message-bubble {
+            max-width: 70%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .message-bubble.sent {
+            background: #8BC34A;
+            color: white;
+        }
+        .message-bubble.received {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        .message-time {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .chat-input-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin: 0;
+            padding: 15px 0 5px 0;
+            flex-shrink: 0;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+        .chat-input-group textarea {
+            flex: 1;
+            resize: none;
+            border-radius: 20px;
+            padding: 12px 16px;
+            height: 44px;
+            font-size: 14px;
+            line-height: 1.4;
+            border: 2px solid #ddd;
+            box-sizing: border-box;
+            min-height: 44px;
+        }
+        .send-btn {
+            background: #8BC34A;
+            color: white !important;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1;
+        }
+        .send-btn:hover {
+            background: #7CB342;
+        }
+        
+        /* Enhanced Send Button Override */
+        .send-btn {
+            background: linear-gradient(135deg, #8BC34A 0%, #7CB342 100%) !important;
+            border-radius: 25px !important;
+            width: auto !important;
+            min-width: 60px !important;
+            padding: 0 16px !important;
+            font-weight: 600 !important;
+            box-shadow: 0 2px 8px rgba(139, 195, 74, 0.3) !important;
+            transition: all 0.3s ease !important;
+        }
+        .send-btn:hover {
+            background: linear-gradient(135deg, #7CB342 0%, #689F38 100%) !important;
+            box-shadow: 0 4px 12px rgba(139, 195, 74, 0.4) !important;
+            transform: translateY(-1px) !important;
+        }        
         .welcome-section { background: linear-gradient(135deg, #2d5016 0%, #3f5340 100%); color: white; padding: 40px 30px; border-radius: 16px; margin-bottom: 30px; position: relative; }
         .welcome-content { display: flex; justify-content: space-between; align-items: center; }
         .welcome-text h1 { font-size: 32px !important; margin-bottom: 10px !important; color: white !important; font-weight: 700 !important; }
@@ -579,6 +839,72 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
     </style>
 </head>
 <body>
+
+<div class="container">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <div class="header-left">
+                <h2 style="margin: 0; color: white;">YCAM Student Portal</h2>
+            </div>
+            <div class="header-right">
+                <button onclick="toggleChat()" class="header-btn chat-btn">
+                    💬 Chat
+                </button>
+                <a href="<?php echo wp_logout_url(home_url('/student-login/')); ?>" class="header-btn logout-btn">
+                    🚪 Logout
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Modal -->
+    <div id="chatModal" class="chat-modal" style="display: none;">
+        <div class="chat-modal-content">
+            <div class="chat-header">
+                <h3>Send Message</h3>
+                <button onclick="toggleChat()" class="close-chat">✕</button>
+            </div>
+            
+            <!-- Message Type Selector -->
+            <div class="message-type-selector">
+                <button type="button" class="msg-type-btn active" onclick="switchMessageType('coach')">
+                    📧 Message Coach
+                </button>
+                <button type="button" class="msg-type-btn" onclick="switchMessageType('admin')">
+                    💬 Message Admin
+                </button>
+            </div>
+            
+            <!-- Coach Message Form -->
+            <form id="coachMessageForm" class="message-form active">
+                <div class="form-group">
+                    <label>Subject:</label>
+                    <input type="text" id="coachSubject" required placeholder="Enter message subject">
+                </div>
+                <div class="form-group">
+                    <label>Message:</label>
+                    <textarea id="coachMessage" required placeholder="Type your message here..." rows="6"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Send to Coach</button>
+                </div>
+            </form>
+            
+            <!-- Admin Message Form -->
+            <form id="adminMessageForm" class="message-form">
+                <div class="chat-container">
+                    <div class="message-history" id="adminMessageHistory">
+                        <!-- Messages will be loaded here -->
+                    </div>
+                    <div class="form-group chat-input-group">
+                        <textarea id="adminMessage" required placeholder="Type your message here..." rows="2"></textarea>
+                        <button type="submit" class="send-btn">Send</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
 <div class="container">
     <!-- Welcome Section -->
@@ -2446,7 +2772,94 @@ document.getElementById('adminMessageForm').addEventListener('submit', function(
         }
     });
 });
-</script>
+// Toggle chat modal
+function toggleChat() {
+    const modal = document.getElementById('chatModal');
+    modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+}
+
+// Switch between message types
+function switchMessageType(type) {
+    // Update buttons
+    document.querySelectorAll('.msg-type-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Update forms
+    document.querySelectorAll('.message-form').forEach(form => form.classList.remove('active'));
+    document.getElementById(type + 'MessageForm').classList.add('active');
+    
+    // Load admin messages if switching to admin chat
+    if (type === 'admin') {
+        loadAdminMessages();
+    }
+}
+
+// Load admin messages for chat interface
+function loadAdminMessages() {
+    fetch(ajaxurl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            action: 'tfsp_get_admin_messages',
+            nonce: '<?php echo wp_create_nonce('tfsp_nonce'); ?>'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayAdminMessages(data.data);
+        } else {
+            console.error('Error loading messages:', data.data);
+            displayAdminMessages([]); // Show empty state
+        }
+    })
+    .catch(error => {
+        console.error('Network error:', error);
+        displayAdminMessages([]); // Show empty state
+    });
+}
+
+// Display admin messages in chat format
+function displayAdminMessages(messages) {
+    const historyDiv = document.getElementById('adminMessageHistory');
+    let html = '';
+    
+    if (!messages || messages.length === 0) {
+        html = '<div style="text-align: center; color: #666; padding: 20px;">No messages yet. Start a conversation!</div>';
+    } else {
+        messages.forEach(msg => {
+            const isFromStudent = msg.sender_type === 'student';
+            const messageClass = isFromStudent ? 'sent' : 'received';
+            const bubbleClass = isFromStudent ? 'sent' : 'received';
+            
+            html += `
+                <div class="chat-message ${messageClass}">
+                    <div class="message-bubble ${bubbleClass}">
+                        ${msg.message || msg.subject || 'No message content'}
+                    </div>
+                    <div class="message-time">
+                        ${new Date(msg.created_at).toLocaleString()}
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    historyDiv.innerHTML = html;
+    historyDiv.scrollTop = historyDiv.scrollHeight;
+}
+
+// Close chat modal when clicking outside
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('chatModal');
+    if (modal) {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                toggleChat();
+            }
+        });
+    }
+});</script>
 
 </body>
 </html>

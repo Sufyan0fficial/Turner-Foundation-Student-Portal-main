@@ -63,7 +63,7 @@ $attendance = $wpdb->get_results($wpdb->prepare(
 ));
 
 // Calculate attendance percentage
-$total_sessions = count($attendance);
+$total_sessions = 98; // Fixed total sessions out of 98
 $present_sessions = count(array_filter($attendance, function($a) { 
     return in_array($a->status, ['present', 'excused']); 
 }));
