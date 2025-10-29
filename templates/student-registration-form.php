@@ -72,20 +72,8 @@ if (is_user_logged_in()) {
                     </select>
                 </div>
                 <div class="tfsp-form-group">
-                    <label class="tfsp-label">Shirt Size</label>
+                    <label class="tfsp-label">Polo Shirt Size</label>
                     <select name="shirt_size" class="tfsp-input" required>
-                        <option value="">Select Size</option>
-                        <option value="XS">XS</option>
-                        <option value="S">S</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
-                    </select>
-                </div>
-                <div class="tfsp-form-group">
-                    <label class="tfsp-label">Blazer Size</label>
-                    <select name="blazer_size" class="tfsp-input" required>
                         <option value="">Select Size</option>
                         <option value="XS">XS</option>
                         <option value="S">S</option>
