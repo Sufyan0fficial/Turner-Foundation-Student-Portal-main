@@ -1,0 +1,1380 @@
+<?php
+/**
+ * Consolidated AJAX Handler Class
+ */
+
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+class TFSP_Ajax_Handler {
+    
+    public function __construct() {
+        // Student registration (public)
+        add_action('wp_ajax_tfsp_register_student', array($this, 'register_student'));
+        add_action('wp_ajax_nopriv_tfsp_register_student', array($this, 'register_student'));
+        
+        // Student actions
+        add_action('wp_ajax_tfsp_upload_document', array($this, 'upload_general_document'));
+        add_action('wp_ajax_tfsp_upload_general_document', array($this, 'upload_general_document'));
+        add_action('wp_ajax_tfsp_update_step_progress', array($this, 'update_step_progress'));
+        add_action('wp_ajax_tfsp_get_student_progress', array($this, 'get_student_progress'));
+        add_action('wp_ajax_tfsp_schedule_meeting', array($this, 'schedule_meeting'));
+        add_action('wp_ajax_tfsp_send_message', array($this, 'send_message'));
+        add_action('wp_ajax_tfsp_update_checklist_status', array($this, 'update_checklist_status'));
+        add_action('wp_ajax_tfsp_update_additional_field', array($this, 'update_additional_field'));
+        add_action('wp_ajax_tfsp_get_notifications', array($this, 'get_notifications'));
+        add_action('wp_ajax_tfsp_get_notification_count', array($this, 'get_notification_count'));
+        add_action('wp_ajax_tfsp_add_application', array($this, 'add_application'));
+        add_action('wp_ajax_tfsp_update_application_status', array($this, 'update_application_status'));
+        add_action('wp_ajax_tfsp_add_student', array($this, 'add_student'));
+        add_action('wp_ajax_tfsp_recreate_tables', array($this, 'recreate_tables'));
+        add_action('wp_ajax_tfsp_get_student_data', array($this, 'get_student_data'));
+        add_action('wp_ajax_tfsp_get_dashboard_data', array($this, 'get_dashboard_data'));
+        add_action('wp_ajax_tfsp_update_progress', array($this, 'update_progress'));
+        add_action('wp_ajax_update_roadmap_status', array($this, 'update_roadmap_status'));
+        add_action('wp_ajax_tfsp_get_messages', array($this, 'get_messages'));
+        add_action('wp_ajax_tfsp_send_coach_message', array($this, 'send_coach_message'));
+        add_action('wp_ajax_tfsp_send_admin_message', array($this, 'send_admin_message'));
+        add_action('wp_ajax_tfsp_get_conversation', array($this, 'get_conversation'));
+        add_action('wp_ajax_tfsp_send_admin_reply', array($this, 'send_admin_reply'));
+        add_action('wp_ajax_tfsp_update_student_progress', array($this, 'update_student_progress_admin'));
+        
+        // Admin actions
+        add_action('wp_ajax_tfsp_get_admin_stats', array($this, 'get_admin_stats'));
+        add_action('wp_ajax_tfsp_save_calendly_settings', array($this, 'save_calendly_settings'));
+        add_action('wp_ajax_tfsp_update_document_status', array($this, 'update_document_status'));
+        add_action('wp_ajax_tfsp_update_meeting_status', array($this, 'update_meeting_status'));
+        add_action('wp_ajax_tfsp_delete_student', array($this, 'delete_student'));
+        // Test upload functionality
+        add_action('wp_ajax_tfsp_test_upload', array($this, 'test_upload_system'));
+    }
+    
+    public function register_student() {
+        $first_name = sanitize_text_field($_POST['first_name']);
+        $last_name = sanitize_text_field($_POST['last_name']);
+        $email = sanitize_email($_POST['email']);
+        $password = $_POST['password'];
+        $student_phone = sanitize_text_field($_POST['student_phone']);
+        $parent_name = sanitize_text_field($_POST['parent_name']);
+        $parent_email = sanitize_email($_POST['parent_email']);
+        $parent_phone = sanitize_text_field($_POST['parent_phone']);
+        $classification = sanitize_text_field($_POST['classification']);
+        $shirt_size = sanitize_text_field($_POST['shirt_size']);
+        $blazer_size = sanitize_text_field($_POST['blazer_size']);
+        
+        if (empty($first_name) || empty($last_name) || empty($email) || empty($password)) {
+            wp_send_json_error('Please fill in all required fields');
+        }
+        
+        if (email_exists($email)) {
+            wp_send_json_error('An account with this email already exists');
+        }
+        
+        $base_username = sanitize_user(strtolower($first_name . '.' . $last_name));
+        $username = $base_username;
+        $counter = 1;
+        
+        while (username_exists($username)) {
+            $username = $base_username . $counter;
+            $counter++;
+        }
+        
+        $user_id = wp_create_user($username, $password, $email);
+        
+        if (is_wp_error($user_id)) {
+            wp_send_json_error($user_id->get_error_message());
+        }
+        
+        wp_update_user(array(
+            'ID' => $user_id,
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'display_name' => $first_name . ' ' . $last_name,
+            'role' => 'subscriber'
+        ));
+
+        global $wpdb;
+        $students_table = $wpdb->prefix . 'tfsp_students';
+        $exists = $wpdb->get_var($wpdb->prepare("SELECT id FROM $students_table WHERE user_id = %d", $user_id));
+        if (!$exists) {
+            $student_id = 'S' . str_pad((string)$user_id, 6, '0', STR_PAD_LEFT);
+            $wpdb->insert(
+                $students_table,
+                array(
+                    'user_id' => $user_id,
+                    'student_id' => $student_id,
+                    'first_name' => $first_name,
+                    'last_name' => $last_name,
+                    'email' => $email,
+                    'student_phone' => $student_phone,
+                    'parent_name' => $parent_name,
+                    'parent_email' => $parent_email,
+                    'parent_phone' => $parent_phone,
+                    'classification' => $classification,
+                    'shirt_size' => $shirt_size,
+                    'blazer_size' => $blazer_size,
+                    'status' => 'active',
+                    'created_at' => current_time('mysql')
+                ),
+                array('%d','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')
+            );
+        }
+        
+        wp_set_current_user($user_id);
+        wp_set_auth_cookie($user_id);
+        
+        wp_send_json_success(array(
+            'message' => 'Account created successfully! Redirecting to your dashboard...',
+            'redirect_url' => home_url('/student-dashboard/')
+        ));
+    }
+    
+    public function upload_general_document() {
+    $debug = defined('WP_DEBUG') && WP_DEBUG;
+    $log = function($msg, $ctx=array()) use ($debug) {
+        if ($debug) error_log('[TFSP_UPLOAD] '.$msg.(empty($ctx)?'':' '.wp_json_encode($ctx)));
+    };
+    $log('start');
+
+    $nonce_val = isset($_POST['nonce']) ? $_POST['nonce'] : '';
+    if (!wp_verify_nonce($nonce_val, 'tfsp_nonce')) {
+        $log('nonce_failed');
+        wp_send_json_error('Security check failed');
+    }
+    if (!is_user_logged_in()) {
+        $log('not_logged_in');
+        wp_send_json_error('User not logged in');
+    }
+    if (!isset($_FILES['document']) || $_FILES['document']['error'] !== UPLOAD_ERR_OK) {
+        $log('file_error', array('err' => isset($_FILES['document']) ? $_FILES['document']['error'] : 'missing'));
+        wp_send_json_error('No file uploaded or upload error');
+    }
+    $document_type = isset($_POST['document_type']) ? sanitize_text_field($_POST['document_type']) : '';
+    if (empty($document_type)) {
+        $log('missing_type');
+        wp_send_json_error('Document type is required');
+    }
+
+    $current_user = wp_get_current_user();
+    $uploaded_file = $_FILES['document'];
+    $log('file_meta', array('name'=>$uploaded_file['name'], 'size'=>(int)$uploaded_file['size']));
+
+    $file_extension = strtolower(pathinfo($uploaded_file['name'], PATHINFO_EXTENSION));
+    $allowed_extensions = array('pdf','doc','docx','jpg','jpeg','png');
+    if (!in_array($file_extension, $allowed_extensions, true)) {
+        $log('bad_ext', array('ext'=>$file_extension));
+        wp_send_json_error('File type not allowed (extension)');
+    }
+
+    $this->ensure_documents_table();
+
+    $upload_dir = wp_upload_dir();
+    $target_dir = trailingslashit($upload_dir['basedir']).'tfsp-documents/';
+    if (!file_exists($target_dir)) { $log('mkdir', array('dir'=>$target_dir)); wp_mkdir_p($target_dir); }
+    $filename = $current_user->ID.'_'.time().'_'.sanitize_file_name($uploaded_file['name']);
+    $target_file = $target_dir.$filename;
+
+    if (!move_uploaded_file($uploaded_file['tmp_name'], $target_file)) {
+        $log('move_failed');
+        wp_send_json_error('Failed to upload file');
+    }
+
+    global $wpdb;        
+    $file_url = trailingslashit($upload_dir['baseurl']).'tfsp-documents/'.$filename;
+    $log('moved', array('to'=>$target_file,'url'=>$file_url));
+
+    $result = $wpdb->insert(
+        $wpdb->prefix.'tfsp_documents',
+        array(
+            'user_id' => $current_user->ID,
+            'document_type' => $document_type,
+            'file_path' => $filename,
+            'file_name' => $uploaded_file['name'],
+            'file_url'  => $file_url,
+            'status' => 'pending',
+            'upload_date' => current_time('mysql')
+        ),
+        array('%d','%s','%s','%s','%s','%s','%s')
+    );
+    if (!$result) {
+        $log('insert_failed', array('err'=>$wpdb->last_error));
+        wp_send_json_error('Failed to save document');
+    }
+    $log('insert_ok', array('id'=>$wpdb->insert_id));
+    wp_send_json_success('Document uploaded successfully');
+}    private function ensure_documents_table() {
+        global $wpdb;
+        $table = $wpdb->prefix.'tfsp_documents';
+        $exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table));
+        $charset_collate = $wpdb->get_charset_collate();
+        if ($exists !== $table) {
+            $sql = "CREATE TABLE $table (
+                id mediumint(9) NOT NULL AUTO_INCREMENT,
+                user_id bigint(20) NOT NULL,
+                document_type varchar(50) NOT NULL,
+                file_name varchar(255) NOT NULL,
+                file_path varchar(255) NOT NULL,
+                file_url varchar(255) NULL,
+                upload_date datetime DEFAULT CURRENT_TIMESTAMP,
+                status varchar(20) DEFAULT 'pending',
+                PRIMARY KEY (id)
+            ) $charset_collate;";
+            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+            dbDelta($sql);
+        }
+    }
+    
+    public function update_step_progress() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_progress_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        $step = sanitize_text_field($_POST['step']);
+        $status = sanitize_text_field($_POST['status']);
+        $user_id = get_current_user_id();
+        
+        global $wpdb;
+        
+        // Ensure table exists
+        $table_name = $wpdb->prefix . 'tfsp_progress';
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'");
+        if (!$table_exists) {
+            $this->create_progress_table();
+        }
+        
+        $result = $wpdb->replace(
+            $wpdb->prefix . 'tfsp_progress',
+            array(
+                'user_id' => $user_id,
+                'step_key' => $step,
+                'status' => (in_array($status, array('complete','completed','Yes'), true)) ? 'completed' : 'pending',
+                'created_at' => current_time('mysql'),
+                'updated_at' => current_time('mysql')
+            ),
+            array('%d','%s','%s','%s','%s')
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success('Progress updated successfully');
+        } else {
+            wp_send_json_error('Failed to update progress');
+        }
+    }
+    
+    public function get_student_progress() {
+        $nonce_valid = wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce') || 
+                      wp_verify_nonce($_POST['nonce'], 'tfsp_progress_nonce');
+        
+        if (!$nonce_valid) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        $user_id = intval($_POST['user_id']);
+        if (!$user_id) {
+            wp_send_json_error('Invalid user ID');
+        }
+        
+        global $wpdb;
+        
+        // Check if progress table exists
+        $table_name = $wpdb->prefix . 'tfsp_progress';
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'");
+        
+        if (!$table_exists) {
+            $this->create_progress_table();
+        }
+        
+        $progress_data = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}tfsp_progress WHERE user_id = %d ORDER BY step_key",
+            $user_id
+        ), ARRAY_A);
+        
+        wp_send_json_success($progress_data);
+    }
+    
+    private function create_progress_table() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'tfsp_progress';
+        $charset_collate = $wpdb->get_charset_collate();
+        
+        $sql = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            user_id bigint(20) NOT NULL,
+            step_key varchar(50) NOT NULL,
+            status varchar(20) NOT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY user_step (user_id, step_key)
+        ) $charset_collate;";
+        
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+    
+    public function schedule_meeting() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        $meeting_datetime = sanitize_text_field($_POST['meeting_datetime']);
+        $meeting_type = sanitize_text_field($_POST['meeting_type']);
+        $notes = sanitize_textarea_field($_POST['notes']);
+        
+        if (!$meeting_datetime) {
+            wp_send_json_error('Meeting time is required');
+        }
+        
+        // Parse datetime
+        $datetime = new DateTime($meeting_datetime);
+        $meeting_date = $datetime->format('Y-m-d');
+        $meeting_time = $datetime->format('H:i:s');
+        
+        global $wpdb;
+        $result = $wpdb->insert(
+            $wpdb->prefix . 'tfsp_meetings',
+            array(
+                'user_id' => get_current_user_id(),
+                'meeting_date' => $meeting_date,
+                'meeting_time' => $meeting_time,
+                'meeting_type' => $meeting_type ?: 'general_guidance',
+                'notes' => $notes,
+                'status' => 'pending',
+                'created_at' => current_time('mysql')
+            )
+        );
+        
+        if ($result) {
+            wp_send_json_success('Meeting scheduled successfully');
+        } else {
+            wp_send_json_error('Failed to schedule meeting');
+        }
+    }
+    
+    public function send_message() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        $subject = sanitize_text_field($_POST['subject']);
+        $message = sanitize_textarea_field($_POST['message']);
+        $priority = sanitize_text_field($_POST['priority']);
+        
+        if (empty($subject) || empty($message)) {
+            wp_send_json_error('Subject and message are required');
+        }
+        
+        global $wpdb;
+        $current_user = wp_get_current_user();
+        
+        $result = $wpdb->insert(
+            $wpdb->prefix . 'tfsp_messages',
+            array(
+                'sender_id' => $current_user->ID,
+                'subject' => $subject,
+                'message' => $message,
+                'priority' => $priority,
+                'status' => 'unread',
+                'created_at' => current_time('mysql')
+            ),
+            array('%d', '%s', '%s', '%s', '%s', '%s')
+        );
+        
+        if ($result) {
+            wp_send_json_success('Message sent successfully');
+        } else {
+            wp_send_json_error('Database error: ' . $wpdb->last_error);
+        }
+    }
+    
+    public function update_checklist_status() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_checklist_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        $item_key = sanitize_text_field($_POST['item_key']);
+        $status = sanitize_text_field($_POST['status']);
+        
+        if (!in_array($status, array('Yes', 'No'))) {
+            wp_send_json_error('Invalid status');
+        }
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'tfsp_checklist_progress';
+        
+        // Check if table exists
+        $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'");
+        if (!$table_exists) {
+            $this->create_checklist_table();
+        }
+        
+        $result = $wpdb->replace(
+            $table_name,
+            array(
+                'user_id' => get_current_user_id(),
+                'item_key' => $item_key,
+                'status' => $status,
+                'updated_at' => current_time('mysql')
+            )
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success('Status updated successfully');
+        } else {
+            wp_send_json_error('Failed to update status');
+        }
+    }
+    
+    public function update_additional_field() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_checklist_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        $item_key = sanitize_text_field($_POST['item_key']);
+        $field_key = sanitize_text_field($_POST['field_key']);
+        $field_value = sanitize_text_field($_POST['field_value']);
+        
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'tfsp_checklist_progress';
+        
+        // Get existing record
+        $existing = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table_name WHERE user_id = %d AND item_key = %s",
+            get_current_user_id(), $item_key
+        ));
+        
+        $additional_data = array();
+        if ($existing && $existing->additional_data) {
+            $additional_data = json_decode($existing->additional_data, true);
+        }
+        
+        $additional_data[$field_key] = $field_value;
+        $json_data = json_encode($additional_data);
+        
+        if ($existing) {
+            $result = $wpdb->update(
+                $table_name,
+                array('additional_data' => $json_data),
+                array('user_id' => get_current_user_id(), 'item_key' => $item_key)
+            );
+        } else {
+            $result = $wpdb->insert(
+                $table_name,
+                array(
+                    'user_id' => get_current_user_id(),
+                    'item_key' => $item_key,
+                    'status' => 'No',
+                    'additional_data' => $json_data,
+                    'updated_at' => current_time('mysql')
+                )
+            );
+        }
+        
+        if ($result !== false) {
+            wp_send_json_success('Field updated successfully');
+        } else {
+            wp_send_json_error('Failed to update field');
+        }
+    }
+    
+    private function create_checklist_table() {
+        global $wpdb;
+        
+        $table_name = $wpdb->prefix . 'tfsp_checklist_progress';
+        $charset_collate = $wpdb->get_charset_collate();
+        
+        $sql = "CREATE TABLE $table_name (
+            id mediumint(9) NOT NULL AUTO_INCREMENT,
+            user_id bigint(20) NOT NULL,
+            item_key varchar(50) NOT NULL,
+            status varchar(10) DEFAULT 'No',
+            additional_data text,
+            updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY user_item (user_id, item_key)
+        ) $charset_collate;";
+        
+        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+        dbDelta($sql);
+    }
+    
+    public function get_admin_stats() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Access denied');
+        }
+        
+        global $wpdb;
+        
+        $stats = array(
+            'total_students' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_students"),
+            'active_students' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_students WHERE status = 'active'"),
+            'total_documents' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_documents"),
+            'pending_documents' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_documents WHERE status = 'pending'"),
+            'approved_documents' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_documents WHERE status = 'approved'"),
+            'total_meetings' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_meetings"),
+            'pending_meetings' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_meetings WHERE status = 'pending'"),
+            'completed_meetings' => $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_meetings WHERE status = 'completed'")
+        );
+        
+        wp_send_json_success($stats);
+    }
+    
+    public function save_calendly_settings() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        $calendly_link = sanitize_url($_POST['calendly_link']);
+        $meeting_title = sanitize_text_field($_POST['meeting_title']);
+        $meeting_description = sanitize_textarea_field($_POST['meeting_description']);
+        
+        if (empty($calendly_link) || empty($meeting_title)) {
+            wp_send_json_error('All fields are required');
+        }
+        
+        if (!filter_var($calendly_link, FILTER_VALIDATE_URL)) {
+            wp_send_json_error('Please enter a valid URL');
+        }
+        
+        update_option('tfsp_calendly_link', $calendly_link);
+        update_option('tfsp_meeting_title', $meeting_title);
+        update_option('tfsp_meeting_description', $meeting_description);
+        
+        wp_send_json_success('Settings saved successfully');
+    }
+    
+    public function update_document_status() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        $document_id = intval($_POST['document_id']);
+        $status = sanitize_text_field($_POST['status']);
+        
+        if (!$document_id || !in_array($status, ['pending', 'approved', 'rejected'])) {
+            wp_send_json_error('Invalid parameters');
+        }
+        
+        global $wpdb;
+        $result = $wpdb->update(
+            $wpdb->prefix . 'tfsp_documents',
+            array('status' => $status),
+            array('id' => $document_id)
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success('Document status updated successfully');
+        } else {
+            wp_send_json_error('Failed to update document status');
+        }
+    }
+    
+    public function update_meeting_status() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        $meeting_id = intval($_POST['meeting_id']);
+        $status = sanitize_text_field($_POST['status']);
+        
+        if (!$meeting_id || !in_array($status, ['pending', 'confirmed', 'completed', 'cancelled'])) {
+            wp_send_json_error('Invalid parameters');
+        }
+        
+        global $wpdb;
+        $result = $wpdb->update(
+            $wpdb->prefix . 'tfsp_meetings',
+            array('status' => $status),
+            array('id' => $meeting_id)
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success('Meeting status updated successfully');
+        } else {
+            wp_send_json_error('Failed to update meeting status');
+        }
+    }
+    
+    public function delete_student() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        $student_id = intval($_POST['student_id']);
+        if (!$student_id) {
+            wp_send_json_error('Invalid student ID');
+        }
+        
+        global $wpdb;
+        
+        $student = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}tfsp_students WHERE id = %d",
+            $student_id
+        ));
+        
+        if (!$student) {
+            wp_send_json_error('Student not found');
+        }
+        
+        // Delete related data
+        $wpdb->delete($wpdb->prefix . 'tfsp_documents', array('user_id' => $student->user_id));
+        $wpdb->delete($wpdb->prefix . 'tfsp_meetings', array('user_id' => $student->user_id));
+        $wpdb->delete($wpdb->prefix . 'tfsp_progress', array('user_id' => $student->user_id));
+        
+        $result = $wpdb->delete($wpdb->prefix . 'tfsp_students', array('id' => $student_id));
+        
+        if ($result) {
+            wp_send_json_success('Student deleted successfully');
+        } else {
+            wp_send_json_error('Failed to delete student');
+        }
+    }
+    
+    public function export_data() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        $export_type = sanitize_text_field($_POST['export_type']);
+        
+        if (!in_array($export_type, ['students', 'documents', 'meetings', 'progress'])) {
+            wp_send_json_error('Invalid export type');
+        }
+        
+        global $wpdb;
+        
+        switch ($export_type) {
+            case 'students':
+                $data = $wpdb->get_results("
+                    SELECT s.*, u.user_email, u.user_registered 
+                    FROM {$wpdb->prefix}tfsp_students s 
+                    LEFT JOIN {$wpdb->prefix}users u ON s.user_id = u.ID 
+                    ORDER BY s.created_at DESC
+                ", ARRAY_A);
+                break;
+                
+            case 'documents':
+                $data = $wpdb->get_results("
+                    SELECT d.*, s.first_name, s.last_name, u.user_email 
+                    FROM {$wpdb->prefix}tfsp_documents d 
+                    LEFT JOIN {$wpdb->prefix}tfsp_students s ON d.user_id = s.user_id 
+                    LEFT JOIN {$wpdb->prefix}users u ON d.user_id = u.ID 
+                    ORDER BY d.uploaded_at DESC
+                ", ARRAY_A);
+                break;
+                
+            case 'meetings':
+                $data = $wpdb->get_results("
+                    SELECT m.*, s.first_name, s.last_name, u.user_email 
+                    FROM {$wpdb->prefix}tfsp_meetings m 
+                    LEFT JOIN {$wpdb->prefix}tfsp_students s ON m.user_id = s.user_id 
+                    LEFT JOIN {$wpdb->prefix}users u ON m.user_id = u.ID 
+                    ORDER BY m.created_at DESC
+                ", ARRAY_A);
+                break;
+                
+            case 'progress':
+                $data = $wpdb->get_results("
+                    SELECT p.*, u.display_name, u.user_email, s.first_name, s.last_name 
+                    FROM {$wpdb->prefix}tfsp_progress p 
+                    LEFT JOIN {$wpdb->prefix}users u ON p.user_id = u.ID 
+                    LEFT JOIN {$wpdb->prefix}tfsp_students s ON p.user_id = s.user_id 
+                    ORDER BY p.updated_at DESC
+                ", ARRAY_A);
+                break;
+        }
+        
+        if (empty($data)) {
+            wp_send_json_error('No data found for export');
+        }
+        
+        $output = fopen('php://temp', 'r+');
+        fputcsv($output, array_keys($data[0]));
+        
+        foreach ($data as $row) {
+            fputcsv($output, $row);
+        }
+        
+        rewind($output);
+        $csv_content = stream_get_contents($output);
+        fclose($output);
+        
+        wp_send_json_success(array(
+            'csv_content' => $csv_content,
+            'filename' => 'tfsp_' . $export_type . '_' . date('Y-m-d_H-i-s') . '.csv'
+        ));
+    }
+    
+    public function get_notifications() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        global $wpdb;
+        $notifications = array();
+        
+        $docs = $wpdb->get_results($wpdb->prepare(
+            "SELECT file_name, status FROM {$wpdb->prefix}tfsp_documents WHERE user_id = %d AND status IN ('approved', 'rejected')",
+            get_current_user_id()
+        ));
+        
+        foreach ($docs as $doc) {
+            $notifications[] = "Document '{$doc->file_name}' has been {$doc->status}";
+        }
+        
+        wp_send_json_success($notifications);
+    }
+    
+    public function get_notification_count() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        global $wpdb;
+        $count = $wpdb->get_var($wpdb->prepare(
+            "SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_documents WHERE user_id = %d AND status IN ('approved', 'rejected')",
+            get_current_user_id()
+        ));
+        
+        wp_send_json_success(intval($count));
+    }
+    
+    public function get_student_data() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        global $wpdb;
+        $user_id = get_current_user_id();
+        
+        // Get assignments (college applications)
+        $assignments = array(
+            array('id' => 1, 'title' => 'Common Application', 'description' => 'Complete your Common App profile', 'due_date' => '2024-12-01'),
+            array('id' => 2, 'title' => 'Personal Statement', 'description' => 'Write your personal essay', 'due_date' => '2024-11-15'),
+            array('id' => 3, 'title' => 'Letters of Recommendation', 'description' => 'Request recommendation letters', 'due_date' => '2024-10-30'),
+            array('id' => 4, 'title' => 'Transcripts', 'description' => 'Submit official transcripts', 'due_date' => '2024-11-30'),
+            array('id' => 5, 'title' => 'SAT/ACT Scores', 'description' => 'Submit standardized test scores', 'due_date' => '2024-12-15')
+        );
+        
+        // Get progress data
+        $progress = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}tfsp_progress WHERE user_id = %d",
+            $user_id
+        ), ARRAY_A);
+        
+        wp_send_json_success(array(
+            'assignments' => $assignments,
+            'progress' => $progress
+        ));
+    }
+    
+    public function get_dashboard_data() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        global $wpdb;
+        $user_id = get_current_user_id();
+        
+        // Get progress data
+        $progress_data = $wpdb->get_results($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}tfsp_progress WHERE user_id = %d",
+            $user_id
+        ), ARRAY_A);
+        
+        $total_applications = 10;
+        $completed_applications = 0;
+        $in_progress_applications = 0;
+        $overall_progress = 0;
+        
+        if (!empty($progress_data)) {
+            foreach ($progress_data as $progress) {
+                if ($progress['status'] === 'completed') {
+                    $completed_applications++;
+                } else {
+                    $in_progress_applications++;
+                }
+            }
+            $overall_progress = round(($completed_applications / $total_applications) * 100);
+        }
+        
+        wp_send_json_success(array(
+            'overall_progress' => $overall_progress,
+            'completed_applications' => $completed_applications,
+            'in_progress_applications' => $in_progress_applications,
+            'total_applications' => $total_applications
+        ));
+    }
+    
+    public function update_progress() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        $user_id = get_current_user_id();
+        
+        // Handle different types of progress updates
+        if (isset($_POST['assignment_id'])) {
+            $assignment_id = intval($_POST['assignment_id']);
+            $progress = intval($_POST['progress']);
+            $status = ($progress >= 100) ? 'completed' : 'in_progress';
+            
+            global $wpdb;
+            $result = $wpdb->replace(
+                $wpdb->prefix . 'tfsp_progress',
+                array(
+                    'user_id' => $user_id,
+                    'step_key' => 'assignment_' . $assignment_id,
+                    'status' => $status,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                )
+            );
+        } elseif (isset($_POST['application_index'])) {
+            $application_index = intval($_POST['application_index']);
+            $status = sanitize_text_field($_POST['status']);
+            
+            global $wpdb;
+            $result = $wpdb->replace(
+                $wpdb->prefix . 'tfsp_progress',
+                array(
+                    'user_id' => $user_id,
+                    'step_key' => 'application_' . $application_index,
+                    'status' => $status,
+                    'created_at' => current_time('mysql'),
+                    'updated_at' => current_time('mysql')
+                )
+            );
+        } else {
+            wp_send_json_error('Missing required parameters');
+        }
+        
+        if ($result !== false) {
+            wp_send_json_success(array('message' => 'Progress updated successfully'));
+        } else {
+            wp_send_json_error('Failed to update progress');
+        }
+    }
+    
+    public function add_application() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        $college_name = sanitize_text_field($_POST['college_name']);
+        $application_type = sanitize_text_field($_POST['application_type']);
+        $deadline = sanitize_text_field($_POST['deadline']);
+        
+        if (empty($college_name) || empty($deadline)) {
+            wp_send_json_error('College name and deadline are required');
+        }
+        
+        global $wpdb;
+        $result = $wpdb->insert(
+            $wpdb->prefix . 'tfsp_applications',
+            array(
+                'user_id' => get_current_user_id(),
+                'college_name' => $college_name,
+                'application_type' => $application_type ?: 'regular',
+                'deadline' => $deadline,
+                'status' => 'not_started',
+                'created_at' => current_time('mysql')
+            )
+        );
+        
+        if ($result) {
+            wp_send_json_success('Application added successfully');
+        } else {
+            wp_send_json_error('Failed to add application');
+        }
+    }
+    
+    public function update_application_status() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        $application_id = intval($_POST['application_id']);
+        $status = sanitize_text_field($_POST['status']);
+        
+        if (!$application_id || !in_array($status, ['not_started', 'in_progress', 'completed', 'submitted'])) {
+            wp_send_json_error('Invalid parameters');
+        }
+        
+        global $wpdb;
+        $result = $wpdb->update(
+            $wpdb->prefix . 'tfsp_applications',
+            array('status' => $status),
+            array('id' => $application_id, 'user_id' => get_current_user_id())
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success('Application status updated successfully');
+        } else {
+            wp_send_json_error('Failed to update application status');
+        }
+    }
+    
+    public function add_student() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Access denied');
+        }
+        
+        $first_name = sanitize_text_field($_POST['first_name']);
+        $last_name = sanitize_text_field($_POST['last_name']);
+        $email = sanitize_email($_POST['email']);
+        // Optional extended fields are ignored if table doesn't contain them
+        
+        if (empty($first_name) || empty($last_name) || empty($email)) {
+            wp_send_json_error('First name, last name, and email are required');
+        }
+        
+        global $wpdb;
+        // Ensure students table exists
+        $students_table = $wpdb->prefix . 'tfsp_students';
+        $exists = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $students_table));
+        if ($exists !== $students_table) {
+            $charset_collate = $wpdb->get_charset_collate();
+            $sql = "CREATE TABLE $students_table (
+                id mediumint(9) NOT NULL AUTO_INCREMENT,
+                user_id bigint(20) NOT NULL,
+                student_id varchar(20) NOT NULL,
+                first_name varchar(100) NOT NULL,
+                last_name varchar(100) NOT NULL,
+                email varchar(100) NOT NULL,
+                status varchar(20) DEFAULT 'active',
+                created_at datetime DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (id)
+            ) $charset_collate;";
+            require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+            dbDelta($sql);
+        }
+
+        $student_id_val = 'S' . str_pad((string) (intval($wpdb->get_var("SELECT IFNULL(MAX(id),0)+1 FROM $students_table"))), 6, '0', STR_PAD_LEFT);
+        $result = $wpdb->insert(
+            $students_table,
+            array(
+                'user_id' => 0,
+                'student_id' => $student_id_val,
+                'first_name' => $first_name,
+                'last_name' => $last_name,
+                'email' => $email,
+                'status' => 'active',
+                'created_at' => current_time('mysql')
+            ),
+            array('%d','%s','%s','%s','%s','%s','%s')
+        );
+        
+        if ($result) {
+            wp_send_json_success('Student added successfully');
+        } else {
+            wp_send_json_error('Failed to add student');
+        }
+    }
+    
+    public function recreate_tables() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Access denied');
+        }
+        
+        global $wpdb;
+        
+        // Drop existing tables
+        $tables = array(
+            $wpdb->prefix . 'tfsp_students',
+            $wpdb->prefix . 'tfsp_documents',
+            $wpdb->prefix . 'tfsp_meetings',
+            $wpdb->prefix . 'tfsp_progress',
+            $wpdb->prefix . 'tfsp_applications',
+            $wpdb->prefix . 'tfsp_checklist_progress'
+        );
+        
+        foreach ($tables as $table) {
+            $wpdb->query("DROP TABLE IF EXISTS $table");
+        }
+        
+        // Recreate tables
+        $this->create_progress_table();
+        $this->create_checklist_table();
+        $this->ensure_documents_table();
+        
+        wp_send_json_success('Tables recreated successfully');
+    }
+    
+    public function update_roadmap_status() {
+        if (!wp_verify_nonce($_POST['nonce'], 'roadmap_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        $step_key = sanitize_text_field($_POST['step_key']);
+        $status = sanitize_text_field($_POST['status']);
+        $user_id = get_current_user_id();
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'tfsp_student_progress';
+        
+        // Check if record exists
+        $existing = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table WHERE student_id = %d AND step = %s",
+            $user_id, $step_key
+        ));
+        
+        if ($existing) {
+            // Update existing record
+            $result = $wpdb->update(
+                $table,
+                array('status' => $status),
+                array('student_id' => $user_id, 'step' => $step_key),
+                array('%s'),
+                array('%d', '%s')
+            );
+        } else {
+            // Insert new record
+            $result = $wpdb->insert(
+                $table,
+                array(
+                    'student_id' => $user_id,
+                    'step' => $step_key,
+                    'status' => $status
+                ),
+                array('%d', '%s', '%s')
+            );
+        }
+        
+        if ($result !== false) {
+            wp_send_json_success('Status updated successfully');
+        } else {
+            wp_send_json_error('Failed to update status');
+        }
+    }
+    
+    public function get_messages() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        global $wpdb;
+        $user_id = get_current_user_id();
+        
+        // Only get portal messages (exclude coach messages by message_type)
+        $messages = $wpdb->get_results($wpdb->prepare(
+            "SELECT *, 
+             CASE WHEN recipient_id IS NULL THEN 'student' ELSE 'admin' END as sender_type,
+             DATE_FORMAT(created_at, '%%M %%d, %%Y %%h:%%i %%p') as created_at
+             FROM {$wpdb->prefix}tfsp_messages 
+             WHERE (sender_id = %d OR recipient_id = %d)
+             AND (message_type IS NULL OR message_type != 'coach')
+             ORDER BY created_at ASC",
+            $user_id, $user_id
+        ));
+        
+        wp_send_json_success($messages);
+    }
+    
+    public function send_coach_message() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        $subject = sanitize_text_field($_POST['subject']);
+        $message = sanitize_textarea_field($_POST['message']);
+        $user = wp_get_current_user();
+        
+        global $wpdb;
+        
+        // Get coach email from advisor settings table
+        $coach_email_setting = $wpdb->get_var("SELECT setting_value FROM {$wpdb->prefix}tfsp_advisor_settings WHERE setting_key = 'coach_email'");
+        
+        if (!$coach_email_setting || empty(trim($coach_email_setting))) {
+            wp_send_json_error('Coach email not configured in Advisor Settings. Please contact administrator to set up the coach email address.');
+        }
+        
+        $coach_email = trim($coach_email_setting);
+        
+        if (!is_email($coach_email)) {
+            wp_send_json_error('Invalid coach email address configured. Please contact administrator.');
+        }
+        
+        // Always log the message first
+        $log_result = $wpdb->insert(
+            $wpdb->prefix . 'tfsp_messages',
+            array(
+                'student_id' => get_current_user_id(),
+                'message_type' => 'coach',
+                'subject' => $subject,
+                'message' => $message,
+                'sender_type' => 'student',
+                'status' => 'pending',
+                'created_at' => current_time('mysql')
+            ),
+            array('%d', '%s', '%s', '%s', '%s', '%s', '%s')
+        );
+        
+        // Send email with proper headers
+        $email_subject = "[Student Portal] " . $subject;
+        $email_message = "Message from: {$user->display_name} ({$user->user_email})\n\n" . $message;
+        
+        $headers = array(
+            'Content-Type: text/plain; charset=UTF-8',
+            'From: ' . get_bloginfo('name') . ' <' . get_option('admin_email') . '>',
+            'Reply-To: ' . $user->display_name . ' <' . $user->user_email . '>'
+        );
+        
+        $sent = wp_mail($coach_email, $email_subject, $email_message, $headers);
+        
+        // Update status based on email result
+        if ($log_result) {
+            $wpdb->update(
+                $wpdb->prefix . 'tfsp_messages',
+                array('status' => $sent ? 'sent' : 'failed'),
+                array('id' => $wpdb->insert_id),
+                array('%s'),
+                array('%d')
+            );
+        }
+        
+        if ($sent) {
+            wp_send_json_success('Message sent to coach: ' . $coach_email);
+        } else {
+            wp_send_json_error('Failed to send email to: ' . $coach_email . '. Please check email configuration.');
+        }
+    }
+    
+    public function send_admin_message() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!is_user_logged_in()) {
+            wp_send_json_error('User not logged in');
+        }
+        
+        $message = sanitize_textarea_field($_POST['message']);
+        $user_id = get_current_user_id();
+        
+        global $wpdb;
+        $result = $wpdb->insert(
+            $wpdb->prefix . 'tfsp_messages',
+            array(
+                'sender_id' => $user_id,
+                'subject' => 'Message to Admin',
+                'message' => $message,
+                'priority' => 'normal',
+                'status' => 'unread',
+                'created_at' => current_time('mysql')
+            ),
+            array('%d', '%s', '%s', '%s', '%s', '%s')
+        );
+        
+        if ($result) {
+            wp_send_json_success('Message sent');
+        } else {
+            wp_send_json_error('Failed to send message: ' . $wpdb->last_error);
+        }
+    }
+    
+    public function get_conversation() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Access denied');
+        }
+        
+        $student_id = intval($_POST['student_id']);
+        
+        global $wpdb;
+        
+        // Get student info
+        $student = $wpdb->get_row($wpdb->prepare(
+            "SELECT display_name, user_email FROM {$wpdb->users} WHERE ID = %d",
+            $student_id
+        ));
+        
+        // Get messages
+        $messages = $wpdb->get_results($wpdb->prepare(
+            "SELECT *, DATE_FORMAT(created_at, '%%M %%d, %%Y %%h:%%i %%p') as created_at
+             FROM {$wpdb->prefix}tfsp_messages 
+             WHERE student_id = %d AND message_type = 'admin' 
+             ORDER BY created_at ASC",
+            $student_id
+        ));
+        
+        // Mark messages as read
+        $wpdb->update(
+            $wpdb->prefix . 'tfsp_messages',
+            array('status' => 'read'),
+            array('student_id' => $student_id, 'message_type' => 'admin', 'sender_type' => 'student'),
+            array('%s'),
+            array('%d', '%s', '%s')
+        );
+        
+        wp_send_json_success(array(
+            'student_name' => $student->display_name,
+            'student_email' => $student->user_email,
+            'messages' => $messages
+        ));
+    }
+    
+    public function send_admin_reply() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Access denied');
+        }
+        
+        $student_id = intval($_POST['student_id']);
+        $message = sanitize_textarea_field($_POST['message']);
+        
+        global $wpdb;
+        $result = $wpdb->insert(
+            $wpdb->prefix . 'tfsp_messages',
+            array(
+                'student_id' => $student_id,
+                'message_type' => 'admin',
+                'message' => $message,
+                'sender_type' => 'admin',
+                'status' => 'sent'
+            ),
+            array('%d', '%s', '%s', '%s', '%s')
+        );
+        
+        if ($result) {
+            wp_send_json_success('Reply sent');
+        } else {
+            wp_send_json_error('Failed to send reply');
+        }
+    }
+    
+    public function update_student_progress_admin() {
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
+            wp_send_json_error('Security check failed');
+        }
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Access denied');
+        }
+        
+        $student_id = intval($_POST['student_id']);
+        $step_key = sanitize_text_field($_POST['step_key']);
+        $status = sanitize_text_field($_POST['status']);
+        
+        global $wpdb;
+        $table = $wpdb->prefix . 'tfsp_student_progress';
+        
+        // Check if record exists
+        $existing = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table WHERE student_id = %d AND step = %s",
+            $student_id, $step_key
+        ));
+        
+        if ($existing) {
+            // Update existing record
+            $result = $wpdb->update(
+                $table,
+                array('status' => $status),
+                array('student_id' => $student_id, 'step' => $step_key),
+                array('%s'),
+                array('%d', '%s')
+            );
+        } else {
+            // Insert new record
+            $result = $wpdb->insert(
+                $table,
+                array(
+                    'student_id' => $student_id,
+                    'step' => $step_key,
+                    'status' => $status
+                ),
+                array('%d', '%s', '%s')
+            );
+        }
+        
+        if ($result !== false) {
+            wp_send_json_success('Progress updated successfully');
+        } else {
+            wp_send_json_error('Failed to update progress');
+        }
+    }
+}
+
+new TFSP_Ajax_Handler();
+
+

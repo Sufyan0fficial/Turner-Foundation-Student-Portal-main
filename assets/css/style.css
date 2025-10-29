@@ -1,0 +1,231 @@
+/* Turner Foundation Student Portal - Complete Branding Override */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Turner Foundation Brand Colors - Override Everything */
+:root {
+    --tf-primary-green: #8BC34A !important;
+    --tf-primary-green-dark: #689F38 !important;
+    --tf-accent-yellow: #FFC107 !important;
+    --tf-text-primary: #000000 !important;
+    --tf-text-secondary: #333333 !important;
+    --tf-bg-white: #FFFFFF !important;
+    --tf-bg-light: #F9F9F9 !important;
+    --tf-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Global Reset and Override */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, .ca-student-portal, .tfsp-dashboard, .dashboard-container {
+    font-family: var(--tf-font-family) !important;
+    background: var(--tf-bg-white) !important;
+    color: var(--tf-text-primary) !important;
+    line-height: 1.5 !important;
+    min-height: 100vh;
+}
+
+/* Headers - Turner Foundation Green */
+.ca-header, .tfsp-header, .header {
+    background: var(--tf-primary-green) !important;
+    color: var(--tf-bg-white) !important;
+    padding: 20px 0 !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.tfsp-header h1, .header h1 {
+    color: var(--tf-bg-white) !important;
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+    text-shadow: none !important;
+}
+
+.tfsp-header p, .header p {
+    color: var(--tf-bg-white) !important;
+    font-size: 16px !important;
+    opacity: 0.95 !important;
+    margin: 0 !important;
+}
+
+/* Buttons - Turner Foundation Style */
+.btn, button, input[type="submit"], .wp-block-button__link, 
+.calendly-button, .logout-btn, a.btn {
+    display: inline-block !important;
+    padding: 12px 24px !important;
+    background: var(--tf-primary-green) !important;
+    color: var(--tf-bg-white) !important;
+    font-family: var(--tf-font-family) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    border: none !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+}
+
+.btn:hover, button:hover, input[type="submit"]:hover,
+.calendly-button:hover, .logout-btn:hover, a.btn:hover {
+    background: var(--tf-primary-green-dark) !important;
+    color: var(--tf-bg-white) !important;
+    text-decoration: none !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Cards and Progress Cards */
+.progress-card, .tf-card, .card, .tfsp-stat-card,
+.academic-challenges, .challenge-card, .calendly-section {
+    background: var(--tf-bg-white) !important;
+    border-radius: 12px !important;
+    padding: 24px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #e5e7eb !important;
+    margin-bottom: 20px !important;
+    transition: all 0.2s ease !important;
+}
+
+.progress-card:hover, .tf-card:hover, .tfsp-stat-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Progress Overview */
+.tfsp-progress-overview, .progress-stats {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 20px !important;
+    margin-bottom: 30px !important;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--tf-font-family) !important;
+    color: var(--tf-text-primary) !important;
+    font-weight: 600 !important;
+    margin-bottom: 16px !important;
+}
+
+h1 { font-size: 32px !important; }
+h2 { font-size: 28px !important; }
+h3 { font-size: 24px !important; }
+h4 { font-size: 20px !important; }
+
+p {
+    color: var(--tf-text-primary) !important;
+    font-family: var(--tf-font-family) !important;
+    line-height: 1.5 !important;
+}
+
+/* Form Elements */
+input[type="text"], input[type="email"], input[type="password"],
+textarea, select {
+    width: 100% !important;
+    padding: 12px 16px !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    font-family: var(--tf-font-family) !important;
+    font-size: 14px !important;
+    color: var(--tf-text-primary) !important;
+    background: var(--tf-bg-white) !important;
+    transition: border-color 0.2s ease !important;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none !important;
+    border-color: var(--tf-primary-green) !important;
+    box-shadow: 0 0 0 3px rgba(139, 195, 74, 0.1) !important;
+}
+
+/* Status Elements */
+.stat-number {
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    color: var(--tf-primary-green) !important;
+    display: block !important;
+}
+
+.stat-label {
+    color: var(--tf-text-secondary) !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+/* Progress Bar */
+.progress-bar {
+    background: #e5e7eb !important;
+    border-radius: 10px !important;
+    height: 8px !important;
+    overflow: hidden !important;
+    margin: 16px 0 !important;
+}
+
+.progress-fill {
+    background: var(--tf-primary-green) !important;
+    height: 100% !important;
+    transition: width 0.3s ease !important;
+}
+
+/* Layout Containers */
+.main-content, .header-content {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 20px !important;
+}
+
+.main-content {
+    padding: 30px 20px !important;
+}
+
+/* User Info */
+.user-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    color: var(--tf-bg-white) !important;
+}
+
+.user-avatar {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 600 !important;
+    color: var(--tf-bg-white) !important;
+}
+
+/* Override any existing gradients */
+.tfsp-dashboard, .dashboard-container,
+.header, .tfsp-stat-card {
+    background: var(--tf-primary-green) !important;
+    background-image: none !important;
+}
+
+.tfsp-dashboard, .dashboard-container {
+    background: var(--tf-bg-white) !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column !important;
+        gap: 16px !important;
+        text-align: center !important;
+    }
+    
+    .tfsp-progress-overview, .progress-stats {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .main-content {
+        padding: 20px 15px !important;
+    }
+}

@@ -1,0 +1,688 @@
+/* Enterprise Attendance System Styles */
+.enterprise-attendance-system {
+    background: linear-gradient(135deg, #f8fffe 0%, #f0f8f7 100%);
+    border-radius: 20px;
+    padding: 0;
+    margin: 20px 0;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    overflow: hidden;
+    border: 1px solid rgba(39, 174, 96, 0.1);
+    width: 100vw;
+    max-width: calc(100vw - 40px);
+    margin-left: calc(-50vw + 50%);
+}
+
+/* Header Section */
+.attendance-header {
+    background: linear-gradient(135deg, #2d5016 0%, #27AE60 100%);
+    color: white;
+    padding: 30px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.attendance-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 200px;
+    height: 200px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(180deg); }
+}
+
+.header-content h1 {
+    margin: 0 0 8px 0;
+    font-size: 28px;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.header-content p {
+    margin: 0;
+    font-size: 16px;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+.month-stats {
+    display: flex;
+    gap: 30px;
+}
+
+.stat-item {
+    text-align: center;
+    background: rgba(255,255,255,0.15);
+    padding: 15px 20px;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateY(-2px);
+}
+
+.stat-number {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 12px;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Controls Panel */
+.controls-panel {
+    background: white;
+    padding: 25px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #e8f5e8;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.navigation-controls {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-btn {
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.nav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+}
+
+.nav-btn:active {
+    transform: translateY(0);
+}
+
+.month-selector-wrapper {
+    position: relative;
+}
+
+#month-selector {
+    padding: 12px 20px;
+    border: 2px solid #e8f5e8;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    background: white;
+    cursor: pointer;
+    min-width: 180px;
+    transition: all 0.3s ease;
+}
+
+#month-selector:focus {
+    outline: none;
+    border-color: #27AE60;
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+.action-controls {
+    display: flex;
+    gap: 15px;
+}
+
+.action-btn {
+    background: white;
+    color: #2d5016;
+    border: 2px solid #e8f5e8;
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    font-size: 13px;
+}
+
+.action-btn:hover {
+    border-color: #27AE60;
+    background: linear-gradient(135deg, #f8fff8 0%, #f0f8f0 100%);
+    transform: translateY(-1px);
+}
+
+.action-btn.export:hover {
+    border-color: #3498DB;
+    color: #3498DB;
+}
+
+.action-btn.analytics:hover {
+    border-color: #9B59B6;
+    color: #9B59B6;
+}
+
+/* Grid Container */
+.attendance-grid-container {
+    display: flex;
+    background: white;
+    min-height: 600px;
+}
+
+/* Students Sidebar */
+.students-sidebar {
+    width: 320px;
+    background: linear-gradient(135deg, #f8fff8 0%, #f0f8f0 100%);
+    border-right: 2px solid #e8f5e8;
+    flex-shrink: 0;
+    overflow-y: auto;
+    max-height: 600px;
+}
+
+.sidebar-header {
+    padding: 20px 25px;
+    background: linear-gradient(135deg, #2d5016 0%, #27AE60 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.student-count {
+    font-size: 12px;
+    opacity: 0.8;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 8px;
+    border-radius: 12px;
+}
+
+.student-row {
+    display: flex;
+    align-items: center;
+    padding: 15px 25px;
+    border-bottom: 1px solid rgba(39, 174, 96, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.student-row:hover {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fff8 100%);
+    transform: translateX(4px);
+    box-shadow: 4px 0 12px rgba(39, 174, 96, 0.1);
+}
+
+.student-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.avatar-text {
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.student-info {
+    flex: 1;
+}
+
+.student-name {
+    font-weight: 700;
+    color: #2d5016;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.student-email {
+    font-size: 12px;
+    color: #666;
+    opacity: 0.8;
+}
+
+.percentage-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    min-width: 50px;
+    transition: all 0.3s ease;
+}
+
+.percentage-badge.excellent {
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+.percentage-badge.good {
+    background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.3);
+}
+
+.percentage-badge.needs-improvement {
+    background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(231, 76, 60, 0.3);
+}
+
+/* Calendar Main */
+.calendar-main {
+    flex: 1;
+    overflow-x: auto;
+    background: white;
+}
+
+.calendar-header-row {
+    display: flex;
+    background: linear-gradient(135deg, #2d5016 0%, #27AE60 100%);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+.date-header {
+    min-width: 60px;
+    padding: 15px 8px;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.date-header.weekend {
+    background: rgba(0,0,0,0.1);
+    opacity: 0.7;
+}
+
+.date-header:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.day-name {
+    font-size: 10px;
+    opacity: 0.8;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.day-number {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.attendance-row {
+    display: flex;
+    border-bottom: 1px solid #f0f0f0;
+    transition: all 0.3s ease;
+}
+
+.attendance-row:hover {
+    background: linear-gradient(135deg, #f8fff8 0%, #f0f8f0 100%);
+}
+
+.attendance-cell {
+    min-width: 60px;
+    padding: 8px 4px;
+    border-right: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.attendance-cell.updating {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    animation: pulse 1s infinite;
+}
+
+.attendance-cell.updated {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    animation: flash 0.5s ease;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes flash {
+    0% { background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); }
+    50% { background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%); }
+    100% { background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%); }
+}
+
+.weekend-cell {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.weekend-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 40px;
+}
+
+.weekend-text {
+    font-size: 10px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.attendance-select {
+    width: 100%;
+    max-width: 50px;
+    padding: 6px 4px;
+    border: 2px solid #e8f5e8;
+    border-radius: 6px;
+    font-size: 10px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.attendance-select:focus {
+    outline: none;
+    border-color: #27AE60;
+    box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.1);
+    transform: scale(1.05);
+}
+
+.attendance-select option {
+    padding: 4px;
+    font-weight: 600;
+}
+
+/* Color coding for attendance select based on value */
+.attendance-select[value="present"] {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border-color: #27AE60;
+}
+
+.attendance-select[value="excused"] {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+    border-color: #3498DB;
+}
+
+.attendance-select[value="absent"] {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border-color: #E74C3C;
+}
+
+.attendance-select[value="postponed"] {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+    border-color: #F39C12;
+}
+
+/* Legend */
+.attendance-legend {
+    background: linear-gradient(135deg, #f8fff8 0%, #f0f8f0 100%);
+    padding: 20px 40px;
+    border-top: 1px solid #e8f5e8;
+}
+
+.attendance-legend h4 {
+    margin: 0 0 15px 0;
+    color: #2d5016;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.legend-items {
+    display: flex;
+    gap: 25px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e8f5e8;
+    transition: all 0.3s ease;
+}
+
+.legend-item:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.legend-item.present .legend-color {
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+}
+
+.legend-item.excused .legend-color {
+    background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+}
+
+.legend-item.absent .legend-color {
+    background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+}
+
+.legend-item.postponed .legend-color {
+    background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%);
+}
+
+.legend-item.weekend .legend-color {
+    background: linear-gradient(135deg, #95A5A6 0%, #7F8C8D 100%);
+}
+
+.legend-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2d5016;
+}
+
+/* Notifications */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10000;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    animation: slideInRight 0.3s ease;
+    max-width: 350px;
+}
+
+.notification.success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border-left: 4px solid #27AE60;
+}
+
+.notification.error {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border-left: 4px solid #E74C3C;
+}
+
+.notification.info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+    border-left: 4px solid #3498DB;
+}
+
+.notification-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    margin-left: 15px;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.notification-close:hover {
+    opacity: 1;
+}
+
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .students-sidebar {
+        width: 280px;
+    }
+    
+    .controls-panel {
+        padding: 20px 30px;
+    }
+    
+    .attendance-header {
+        padding: 25px 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .attendance-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .month-stats {
+        gap: 15px;
+    }
+    
+    .controls-panel {
+        flex-direction: column;
+        gap: 15px;
+        padding: 20px;
+    }
+    
+    .navigation-controls {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .action-controls {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .students-sidebar {
+        width: 250px;
+    }
+    
+    .student-row {
+        padding: 12px 20px;
+    }
+    
+    .attendance-legend {
+        padding: 15px 20px;
+    }
+    
+    .legend-items {
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .enterprise-attendance-system {
+        margin: 10px 0;
+        border-radius: 15px;
+    }
+    
+    .students-sidebar {
+        width: 220px;
+    }
+    
+    .date-header {
+        min-width: 50px;
+        padding: 12px 6px;
+    }
+    
+    .attendance-cell {
+        min-width: 50px;
+        padding: 6px 2px;
+    }
+    
+    .attendance-select {
+        max-width: 40px;
+        font-size: 9px;
+    }
+    
+    .stat-item {
+        padding: 10px 15px;
+    }
+    
+    .stat-number {
+        font-size: 20px;
+    }
+}

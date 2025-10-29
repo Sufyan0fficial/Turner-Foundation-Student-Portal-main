@@ -1,0 +1,27 @@
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.code-workspace
+
+# Node / build artefacts
+node_modules/
+dist/
+build/
+
+# Composer
+vendor/
+composer.lock
+
+# Logs
+*.log
+debug.log
+
+# Misc
+*.zip
+*.tar
+*.tar.gz
+*.tmp
+~$*
+

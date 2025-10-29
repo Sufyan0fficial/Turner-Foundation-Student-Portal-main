@@ -1,0 +1,571 @@
+/* Improved Attendance Layout */
+.enterprise-attendance-system {
+    background: linear-gradient(135deg, #f8fffe 0%, #f0f8f7 100%);
+    border-radius: 20px;
+    padding: 0;
+    margin: 20px 0;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    overflow: hidden;
+    border: 1px solid rgba(39, 174, 96, 0.1);
+    width: 100vw;
+    max-width: calc(100vw - 40px);
+    margin-left: calc(-50vw + 50%);
+}
+
+/* Enhanced Header */
+.attendance-header {
+    background: linear-gradient(135deg, #2d5016 0%, #27AE60 100%);
+    color: white;
+    padding: 35px 45px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.header-content h1 {
+    margin: 0 0 10px 0;
+    font-size: 32px;
+    font-weight: 800;
+    text-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    letter-spacing: -0.5px;
+}
+
+.header-content p {
+    margin: 0;
+    font-size: 18px;
+    opacity: 0.95;
+    font-weight: 500;
+}
+
+.month-stats {
+    display: flex;
+    gap: 35px;
+}
+
+.stat-item {
+    text-align: center;
+    background: rgba(255,255,255,0.18);
+    padding: 20px 25px;
+    border-radius: 15px;
+    backdrop-filter: blur(15px);
+    transition: all 0.4s ease;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.stat-item:hover {
+    background: rgba(255,255,255,0.28);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.stat-number {
+    display: block;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.stat-label {
+    font-size: 13px;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+}
+
+/* Enhanced Controls */
+.controls-panel {
+    background: white;
+    padding: 30px 45px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e8f5e8;
+    flex-wrap: wrap;
+    gap: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.nav-btn {
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.4s ease;
+    box-shadow: 0 6px 18px rgba(39, 174, 96, 0.3);
+    font-size: 14px;
+}
+
+.nav-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(39, 174, 96, 0.4);
+}
+
+#month-selector {
+    padding: 14px 24px;
+    border: 3px solid #e8f5e8;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    background: white;
+    cursor: pointer;
+    min-width: 200px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+#month-selector:focus {
+    outline: none;
+    border-color: #27AE60;
+    box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.15);
+}
+
+.action-btn {
+    background: white;
+    color: #2d5016;
+    border: 3px solid #e8f5e8;
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.4s ease;
+    font-size: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.action-btn:hover {
+    border-color: #27AE60;
+    background: linear-gradient(135deg, #f8fff8 0%, #f0f8f0 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* Improved Grid Container */
+.attendance-grid-container {
+    display: flex;
+    background: white;
+    min-height: 750px;
+    border-radius: 0 0 20px 20px;
+    overflow: hidden;
+}
+
+/* Enhanced Students Sidebar */
+.students-sidebar {
+    width: 380px;
+    background: linear-gradient(135deg, #f8fff8 0%, #f0f8f0 100%);
+    border-right: 4px solid #e8f5e8;
+    flex-shrink: 0;
+    overflow-y: auto;
+    max-height: 750px;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.08);
+}
+
+.sidebar-header {
+    padding: 28px 35px;
+    background: linear-gradient(135deg, #2d5016 0%, #27AE60 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.sidebar-header h3 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.student-count {
+    font-size: 14px;
+    opacity: 0.95;
+    background: rgba(255,255,255,0.25);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+.student-row {
+    display: flex;
+    align-items: center;
+    padding: 22px 35px;
+    border-bottom: 1px solid rgba(39, 174, 96, 0.08);
+    transition: all 0.4s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.student-row::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background: transparent;
+    transition: all 0.4s ease;
+}
+
+.student-row:hover {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fff8 100%);
+    transform: translateX(8px);
+    box-shadow: 8px 0 25px rgba(39, 174, 96, 0.18);
+}
+
+.student-row:hover::before {
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+}
+
+.student-avatar {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    box-shadow: 0 8px 20px rgba(52, 152, 219, 0.35);
+    transition: all 0.4s ease;
+}
+
+.student-row:hover .student-avatar {
+    transform: scale(1.08);
+    box-shadow: 0 12px 30px rgba(52, 152, 219, 0.45);
+}
+
+.avatar-text {
+    color: white;
+    font-weight: 800;
+    font-size: 18px;
+}
+
+.student-info {
+    flex: 1;
+    margin-right: 18px;
+}
+
+.student-name {
+    font-weight: 800;
+    color: #2d5016;
+    font-size: 17px;
+    margin-bottom: 5px;
+    line-height: 1.2;
+}
+
+.student-email {
+    font-size: 14px;
+    color: #666;
+    opacity: 0.85;
+    line-height: 1.2;
+}
+
+.percentage-badge {
+    padding: 10px 18px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 800;
+    text-align: center;
+    min-width: 70px;
+    transition: all 0.4s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.percentage-badge.excellent {
+    background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+}
+
+.percentage-badge.good {
+    background: linear-gradient(135deg, #F39C12 0%, #E67E22 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(243, 156, 18, 0.4);
+}
+
+.percentage-badge.needs-improvement {
+    background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+/* Enhanced Calendar Main */
+.calendar-main {
+    flex: 1;
+    overflow-x: auto;
+    background: white;
+    position: relative;
+}
+
+.calendar-header-row {
+    display: flex;
+    background: linear-gradient(135deg, #2d5016 0%, #27AE60 100%);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+}
+
+.date-header {
+    min-width: 75px;
+    padding: 20px 12px;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.2);
+    flex-shrink: 0;
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+.date-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 4px;
+    background: rgba(255,255,255,0.9);
+    transition: width 0.4s ease;
+}
+
+.date-header:hover::after {
+    width: 85%;
+}
+
+.date-header.weekend {
+    background: rgba(0,0,0,0.2);
+    opacity: 0.75;
+}
+
+.date-header:hover {
+    background: rgba(255,255,255,0.15);
+    transform: translateY(-3px);
+}
+
+.day-name {
+    font-size: 12px;
+    opacity: 0.95;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.day-number {
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.attendance-row {
+    display: flex;
+    border-bottom: 1px solid #f8f8f8;
+    transition: all 0.4s ease;
+    min-height: 70px;
+    align-items: center;
+}
+
+.attendance-row:hover {
+    background: linear-gradient(135deg, #f8fff8 0%, #f0f8f0 100%);
+    box-shadow: 0 3px 12px rgba(39, 174, 96, 0.12);
+}
+
+.attendance-cell {
+    min-width: 75px;
+    padding: 15px 10px;
+    border-right: 1px solid #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.4s ease;
+    position: relative;
+}
+
+.attendance-cell.updating {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    animation: pulse 2s infinite;
+}
+
+.attendance-cell.updated {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    animation: flash 1s ease;
+}
+
+.weekend-cell {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-right: 1px solid #dee2e6;
+}
+
+.weekend-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50px;
+    border-radius: 10px;
+    background: rgba(108, 117, 125, 0.12);
+}
+
+.weekend-text {
+    font-size: 12px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 700;
+}
+
+.attendance-select {
+    width: 100%;
+    max-width: 60px;
+    padding: 10px 8px;
+    border: 3px solid #e8f5e8;
+    border-radius: 10px;
+    font-size: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    font-weight: 700;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+}
+
+.attendance-select:focus {
+    outline: none;
+    border-color: #27AE60;
+    box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.2);
+    transform: scale(1.1);
+}
+
+.attendance-select:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+/* Color coding for attendance select based on value */
+.attendance-select[value="present"] {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border-color: #27AE60;
+    box-shadow: 0 4px 15px rgba(39, 174, 96, 0.2);
+}
+
+.attendance-select[value="excused"] {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+    border-color: #3498DB;
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+}
+
+.attendance-select[value="absent"] {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border-color: #E74C3C;
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
+}
+
+.attendance-select[value="postponed"] {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+    border-color: #F39C12;
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
+}
+
+/* Enhanced Legend */
+.attendance-legend {
+    background: linear-gradient(135deg, #f8fff8 0%, #f0f8f0 100%);
+    padding: 25px 45px;
+    border-top: 2px solid #e8f5e8;
+}
+
+.attendance-legend h4 {
+    margin: 0 0 20px 0;
+    color: #2d5016;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.legend-items {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 18px;
+    background: white;
+    border-radius: 12px;
+    border: 2px solid #e8f5e8;
+    transition: all 0.4s ease;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+}
+
+.legend-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.legend-text {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2d5016;
+}
+
+/* Responsive improvements */
+@media (max-width: 1200px) {
+    .students-sidebar {
+        width: 320px;
+    }
+    
+    .controls-panel {
+        padding: 25px 35px;
+    }
+    
+    .attendance-header {
+        padding: 30px 35px;
+    }
+}
+
+@media (max-width: 768px) {
+    .students-sidebar {
+        width: 280px;
+    }
+    
+    .date-header {
+        min-width: 65px;
+        padding: 15px 8px;
+    }
+    
+    .attendance-cell {
+        min-width: 65px;
+        padding: 12px 6px;
+    }
+    
+    .attendance-select {
+        max-width: 50px;
+        font-size: 11px;
+    }
+}

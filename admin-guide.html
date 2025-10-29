@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YCAM Student Portal - Administrator Guide</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 30px;
+            background: linear-gradient(135deg, #3f5340 0%, #8ebb79 100%);
+            color: white;
+            border-radius: 12px;
+            margin: -40px -40px 50px -40px;
+        }
+        .header h1 { 
+            font-size: 2.5em;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+            color: white !important;
+        }
+        .header h2 { 
+            font-size: 1.3em;
+            margin: 0 0 20px 0;
+            font-weight: 400;
+            opacity: 0.9;
+            color: white !important;
+        }
+        .header .meta {
+            font-size: 0.95em;
+            opacity: 0.8;
+            color: white !important;
+        }
+        h1 { color: #2c5530; border-bottom: 3px solid #8ebb79; padding-bottom: 15px; }
+        h2 { 
+            color: #3f5340; 
+            border-bottom: 2px solid #8ebb79; 
+            padding-bottom: 8px; 
+            margin-top: 40px;
+            font-size: 1.8em;
+        }
+        h3 { 
+            color: #5a6b5d; 
+            margin-top: 30px;
+            font-size: 1.3em;
+        }
+        .toc { 
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px; 
+            border-radius: 10px; 
+            margin: 30px 0;
+            border-left: 5px solid #8ebb79;
+        }
+        .toc h3 {
+            color: #3f5340;
+            margin-top: 0;
+        }
+        .warning { 
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 20%);
+            border: 1px solid #ffeaa7; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin: 20px 0;
+            border-left: 5px solid #f39c12;
+        }
+        .info { 
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 20%);
+            border: 1px solid #bee5eb; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin: 20px 0;
+            border-left: 5px solid #17a2b8;
+        }
+        .code { 
+            background: #2c3e50; 
+            color: #ecf0f1;
+            border: 1px solid #34495e; 
+            padding: 15px; 
+            border-radius: 6px; 
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+        }
+        .step { 
+            background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 20%);
+            padding: 20px; 
+            margin: 15px 0; 
+            border-left: 5px solid #8ebb79;
+            border-radius: 8px;
+        }
+        ul, ol { margin-left: 25px; }
+        li { margin-bottom: 8px; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 15px; 
+            text-align: left; 
+        }
+        th { 
+            background: linear-gradient(135deg, #3f5340 0%, #5a6b5d 100%);
+            color: white;
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        .footer { 
+            text-align: center; 
+            margin-top: 50px; 
+            padding: 30px;
+            background: linear-gradient(135deg, #3f5340 0%, #8ebb79 100%);
+            color: white;
+            border-radius: 12px;
+            margin-left: -40px;
+            margin-right: -40px;
+        }
+        .brand-accent {
+            color: #8ebb79;
+            font-weight: 600;
+        }
+        .section-divider {
+            height: 3px;
+            background: linear-gradient(90deg, #3f5340 0%, #8ebb79 50%, #3f5340 100%);
+            margin: 40px 0;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>YCAM Mentorship Program</h1>
+        <h2>Student Portal Administrator Guide</h2>
+        <div class="meta">
+            <strong>Version:</strong> 3.0.0 | <strong>Date:</strong> January 2025<br>
+            <strong>Turner Foundation</strong> | <strong>Community Advocacy Program</strong>
+        </div>
+    </div>
+
+    <div class="toc">
+        <h3>Quick Start Guide</h3>
+        <ol>
+            <li>Access admin portal: <code>https://yourdomain.com/portal-admin/</code></li>
+            <li>Login with credentials (admin/YCAMAdmin2024!)</li>
+            <li>Configure Advisor Settings (coach email, meeting link)</li>
+            <li>Test student registration and document upload</li>
+        </ol>
+    </div>
+
+    <div class="section-divider"></div>
+
+    <h2>Accessing the Admin Portal</h2>
+
+    <div class="step">
+        <strong>Step 1:</strong> Navigate to your admin portal<br>
+        <div class="code">https://yourdomain.com/portal-admin/</div>
+    </div>
+
+    <div class="step">
+        <strong>Step 2:</strong> Use admin credentials<br>
+        <strong>Username:</strong> admin<br>
+        <strong>Password:</strong> YCAMAdmin2024!
+    </div>
+
+    <h2>First-Time Configuration</h2>
+
+    <h3>1. Advisor Settings Configuration</h3>
+    <p>Navigate to <span class="brand-accent">Advisor Settings</span> and configure:</p>
+    <ul>
+        <li><strong>Coach Email:</strong> Where student messages are sent (e.g., coach@yourdomain.com)</li>
+        <li><strong>Meeting Link:</strong> Your Calendly or scheduling URL</li>
+        <li><strong>Section Title:</strong> "College and Career Coach"</li>
+        <li><strong>Statistics:</strong> Update student numbers and success rates</li>
+        <li><strong>Recommendation Settings:</strong> Form links and email addresses</li>
+    </ul>
+
+    <h3>2. Test System Functionality</h3>
+    <ul>
+        <li>Register a test student</li>
+        <li>Upload a test document</li>
+        <li>Send a test message</li>
+        <li>Verify email delivery</li>
+    </ul>
+
+    <div class="section-divider"></div>
+
+<h2> Dashboard Overview</h2>
+
+<h3>Main Statistics</h3>
+<table>
+    <tr><th>Metric</th><th>Description</th></tr>
+    <tr><td>Total Students</td><td>Current enrollment count</td></tr>
+    <tr><td>Total Documents</td><td>All uploaded documents</td></tr>
+    <tr><td>Pending Documents</td><td>Awaiting your approval</td></tr>
+    <tr><td>Unread Messages</td><td>New student communications</td></tr>
+</table>
+
+<h3>Navigation Menu</h3>
+<ul>
+    <li> <strong>Dashboard</strong> - Overview and statistics</li>
+    <li> <strong>Attendance</strong> - Weekly attendance tracking</li>
+    <li> <strong>Coach Sessions</strong> - One-on-one session management</li>
+    <li> <strong>Students</strong> - Student profiles and progress</li>
+    <li> <strong>Challenges</strong> - Gamified progress tracking</li>
+    <li> <strong>Recommendations</strong> - Letter tracking system</li>
+    <li> <strong>Advisor Settings</strong> - Portal configuration</li>
+    <li> <strong>Documents</strong> - Document approval workflow</li>
+    <li> <strong>Messages</strong> - Communication center</li>
+</ul>
+
+<h2> Student Management</h2>
+
+<h3>Viewing Students</h3>
+<div class="step">
+    <strong>Step 1:</strong> Click <strong>Students</strong> in navigation<br>
+    <strong>Step 2:</strong> Use search bar to find specific students<br>
+    <strong>Step 3:</strong> Click student name for detailed profile
+</div>
+
+<h3>Student Drill-Down Features</h3>
+<ul>
+    <li><strong>Personal Information:</strong> Contact details, classification, parent info</li>
+    <li><strong>Roadmap Progress:</strong> 10-step completion status with percentages</li>
+    <li><strong>Attendance Records:</strong> Weekly participation history</li>
+    <li><strong>Coach Sessions:</strong> Scheduled meetings and notes</li>
+    <li><strong>Documents:</strong> Uploaded files with approval status</li>
+    <li><strong>Messages:</strong> Complete communication history</li>
+</ul>
+
+<h3>10-Step College Roadmap</h3>
+<ol>
+    <li>Academic Resume</li>
+    <li>Personal Essay</li>
+    <li>Recommendation Letters</li>
+    <li>Transcript</li>
+    <li>Financial Aid</li>
+    <li>Community Service</li>
+    <li>Create Interest List of Colleges</li>
+    <li>College Tours</li>
+    <li>FAFSA</li>
+    <li>College Admissions Tests</li>
+</ol>
+
+<h2> Attendance Tracking</h2>
+
+<h3>Recording Daily Attendance</h3>
+<div class="step">
+    <strong>Step 1:</strong> Navigate to <strong>Attendance</strong><br>
+    <strong>Step 2:</strong> Select date using date picker<br>
+    <strong>Step 3:</strong> Mark each student as Present, Absent, Tardy, or Excused<br>
+    <strong>Step 4:</strong> Click <strong>Save Attendance</strong>
+</div>
+
+<h3>Attendance Status Options</h3>
+<table>
+    <tr><th>Status</th><th>Color</th><th>Description</th></tr>
+    <tr><td>Present</td><td>Green</td><td>Student attended session</td></tr>
+    <tr><td>Absent</td><td>Red</td><td>Student did not attend</td></tr>
+    <tr><td>Tardy</td><td>Orange</td><td>Student arrived late</td></tr>
+    <tr><td>Excused</td><td>Blue</td><td>Approved absence</td></tr>
+</table>
+
+<h2> Messaging Center</h2>
+
+<h3>Two Communication Systems</h3>
+
+<h4>1. Portal Messages (Internal Chat)</h4>
+<ul>
+    <li>Direct communication between admin and students</li>
+    <li>Select student from list to view conversation</li>
+    <li>Send replies and follow-ups</li>
+    <li>Real-time message status tracking</li>
+</ul>
+
+<h4>2. Coach Messages (Email System)</h4>
+<ul>
+    <li>Students send messages to career coach via email</li>
+    <li>Messages logged in admin portal for tracking</li>
+    <li>Coach email configured in Advisor Settings</li>
+    <li>View all coach communications in one place</li>
+</ul>
+
+<div class="info">
+    <strong> Coach Email Setup:</strong> The coach email address is displayed at the top of the Coach Messages tab. Students can see exactly where their messages are being sent.
+</div>
+
+<h2> Document Management</h2>
+
+<h3>Document Approval Workflow</h3>
+<div class="step">
+    <strong>Step 1:</strong> Students upload documents through their portal<br>
+    <strong>Step 2:</strong> Documents appear in your <strong>Documents</strong> section<br>
+    <strong>Step 3:</strong> Review document content<br>
+    <strong>Step 4:</strong> Choose action: Approve, Send Back, or Delete
+</div>
+
+<h3>Community Service Letters (Special Process)</h3>
+<ol>
+    <li>Admin uploads 50-hour completion letter (status: Pending)</li>
+    <li>Letter is invisible to student until approved</li>
+    <li>Ms. Parkman reviews and approves letter</li>
+    <li>Student sees download banner in their portal</li>
+    <li>Provides complete auditable approval trail</li>
+</ol>
+
+<h2> Challenge System</h2>
+
+<h3>Creating Challenges</h3>
+<div class="step">
+    <strong>Step 1:</strong> Navigate to <strong>Challenges</strong><br>
+    <strong>Step 2:</strong> Click <strong>Add New Challenge</strong><br>
+    <strong>Step 3:</strong> Fill in challenge details<br>
+    <strong>Step 4:</strong> Link to roadmap step (optional)<br>
+    <strong>Step 5:</strong> Set difficulty level and target percentage
+</div>
+
+<h3>Difficulty Levels</h3>
+<ul>
+    <li><strong>Grade-level agnostic:</strong> Suitable for all students</li>
+    <li><strong>Freshman Pace:</strong> 9th grade appropriate</li>
+    <li><strong>Sophomore Pace:</strong> 10th grade appropriate</li>
+    <li><strong>Junior Pace:</strong> 11th grade appropriate</li>
+    <li><strong>Senior Pace:</strong> 12th grade appropriate</li>
+</ul>
+
+<h2> Troubleshooting</h2>
+
+<h3>Common Issues & Solutions</h3>
+
+<div class="warning">
+    <strong>Database Table Missing Error:</strong><br>
+    Contact your web developer to resolve database table issues.
+</div>
+
+<div class="warning">
+    <strong>Cannot Access Admin Portal:</strong><br>
+    1. Check URL: <code>https://yourdomain.com/portal-admin/</code><br>
+    2. Verify login access with web developer<br>
+    3. Clear browser cache<br>
+    4. Contact technical support
+</div>
+
+<div class="warning">
+    <strong>File Upload Problems:</strong><br>
+    1. Contact web developer to check file permissions<br>
+    2. Verify file size limits<br>
+    3. Try different file formats
+</div>
+
+<div class="warning">
+    <strong>Coach Messages Not Working:</strong><br>
+    1. Configure coach email in Advisor Settings<br>
+    2. Contact web developer to check email configuration<br>
+    3. Test with different email provider
+</div>
+
+<div class="footer">
+    <p><strong>Turner Foundation / YCAM Mentorship Program</strong><br>
+    Student Portal Version 3.0.0 - January 2025<br>
+    <em>This guide covers essential admin functions. For additional support, contact the development team.</em></p>
+</div>
+
+</body>
+</html>

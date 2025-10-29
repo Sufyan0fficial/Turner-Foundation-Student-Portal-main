@@ -1,0 +1,316 @@
+/* Turner Foundation Dashboard - Complete Override */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Force Turner Foundation Branding */
+.tfsp-dashboard, .dashboard-container, body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    background: #FFFFFF !important;
+    background-image: none !important;
+    min-height: 100vh !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    color: #000000 !important;
+}
+
+/* Header - Turner Foundation Green */
+.header {
+    background: #8BC34A !important;
+    background-image: none !important;
+    color: #FFFFFF !important;
+    padding: 20px 0 !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+}
+
+.header-content {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 20px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+.header h1, .header-logo {
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    color: #FFFFFF !important;
+    text-decoration: none !important;
+    margin: 0 !important;
+}
+
+.user-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    color: #FFFFFF !important;
+}
+
+.user-avatar {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.2) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 600 !important;
+    font-size: 16px !important;
+    color: #FFFFFF !important;
+}
+
+/* Main Content */
+.main-content {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 30px 20px !important;
+}
+
+/* Progress Overview */
+.progress-overview {
+    margin-bottom: 40px !important;
+}
+
+.progress-overview h2 {
+    color: #000000 !important;
+    margin-bottom: 20px !important;
+    font-size: 28px !important;
+    font-weight: 600 !important;
+}
+
+.progress-stats {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 20px !important;
+    margin-bottom: 30px !important;
+}
+
+.stat-card {
+    background: #FFFFFF !important;
+    padding: 20px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    text-align: center !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+.stat-number {
+    font-size: 32px !important;
+    font-weight: 700 !important;
+    color: #8BC34A !important;
+    display: block !important;
+}
+
+.stat-label {
+    color: #333333 !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    margin-top: 8px !important;
+}
+
+/* Cards */
+.tf-card, .progress-card, .card {
+    background: #FFFFFF !important;
+    border-radius: 12px !important;
+    padding: 24px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+    border: 1px solid #e5e7eb !important;
+    margin-bottom: 20px !important;
+    transition: all 0.2s ease !important;
+}
+
+.tf-card:hover, .progress-card:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Buttons */
+.btn, button, input[type="submit"], .calendly-button, .logout-btn {
+    display: inline-block !important;
+    padding: 12px 24px !important;
+    background: #8BC34A !important;
+    color: #FFFFFF !important;
+    font-family: 'Inter', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    border: none !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
+    background-image: none !important;
+}
+
+.btn:hover, button:hover, input[type="submit"]:hover, .calendly-button:hover {
+    background: #689F38 !important;
+    color: #FFFFFF !important;
+    text-decoration: none !important;
+    transform: translateY(-1px) !important;
+}
+
+.btn-secondary, .logout-btn {
+    background: transparent !important;
+    color: #FFFFFF !important;
+    border: 2px solid #FFFFFF !important;
+}
+
+.btn-secondary:hover, .logout-btn:hover {
+    background: #FFFFFF !important;
+    color: #8BC34A !important;
+}
+
+/* Progress Steps */
+.progress-steps {
+    display: grid !important;
+    gap: 16px !important;
+}
+
+.step-item {
+    background: #FFFFFF !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+    border-left: 4px solid #e5e7eb !important;
+    transition: all 0.2s ease !important;
+}
+
+.step-item.completed {
+    border-left-color: #10b981 !important;
+}
+
+.step-item.in-progress {
+    border-left-color: #FFC107 !important;
+}
+
+.step-item:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
+    transform: translateX(4px) !important;
+}
+
+.step-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 8px !important;
+}
+
+.step-title {
+    font-weight: 600 !important;
+    color: #000000 !important;
+}
+
+.step-question {
+    color: #333333 !important;
+    font-size: 14px !important;
+    margin-top: 8px !important;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block !important;
+    padding: 4px 12px !important;
+    border-radius: 20px !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+
+.status-completed {
+    background-color: #10b981 !important;
+    color: #FFFFFF !important;
+}
+
+.status-in-progress, .status-pending {
+    background-color: #FFC107 !important;
+    color: #000000 !important;
+}
+
+.status-not-started {
+    background-color: #e5e7eb !important;
+    color: #333333 !important;
+}
+
+/* Progress Bar */
+.progress-bar {
+    background-color: #e5e7eb !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    height: 8px !important;
+    margin: 16px 0 !important;
+}
+
+.progress-fill {
+    background-color: #8BC34A !important;
+    height: 100% !important;
+    transition: width 0.3s ease !important;
+}
+
+/* Grid System */
+.tf-grid {
+    display: grid !important;
+    gap: 20px !important;
+}
+
+.tf-grid-2 { grid-template-columns: repeat(2, 1fr) !important; }
+.tf-grid-3 { grid-template-columns: repeat(3, 1fr) !important; }
+.tf-grid-4 { grid-template-columns: repeat(4, 1fr) !important; }
+
+/* Sections */
+.tf-section {
+    margin-bottom: 40px !important;
+}
+
+.tf-section h2 {
+    color: #000000 !important;
+    margin-bottom: 20px !important;
+    font-size: 28px !important;
+    font-weight: 600 !important;
+}
+
+.tf-section h3 {
+    color: #000000 !important;
+    margin-bottom: 16px !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+}
+
+/* Utility Classes */
+.tf-text-center { text-align: center !important; }
+.tf-mb-sm { margin-bottom: 8px !important; }
+.tf-mb-md { margin-bottom: 16px !important; }
+.tf-mt-sm { margin-top: 8px !important; }
+.tf-mt-md { margin-top: 16px !important; }
+.tf-mt-lg { margin-top: 32px !important; }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column !important;
+        gap: 16px !important;
+        text-align: center !important;
+    }
+    
+    .user-info {
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    
+    .tf-grid-2, .tf-grid-3, .tf-grid-4 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .main-content {
+        padding: 20px 15px !important;
+    }
+    
+    .progress-stats {
+        grid-template-columns: 1fr !important;
+    }
+}
