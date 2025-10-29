@@ -28,7 +28,23 @@ if (!$student) {
     wp_die('Student not found');
 }
 
-// Get student documents
+// Handle waiver status update
+if (isset($_POST['update_waiver_status']) && wp_verify_nonce($_POST['waiver_nonce'], 'update_waiver_status')) {
+    $new_status = sanitize_text_field($_POST['waiver_status']);
+    $wpdb->update(
+        $students_table,
+        array('waiver_status' => $new_status),
+        array('user_id' => $student_id),
+        array('%s'),
+        array('%d')
+    );
+    echo '<div class="notice notice-success"><p>Waiver status updated successfully!</p></div>';
+    // Refresh student data
+    $student = $wpdb->get_row($wpdb->prepare(
+        "SELECT * FROM $students_table WHERE user_id = %d",
+        $student_id
+    ));
+}// Get student documents
 $documents = $wpdb->get_results($wpdb->prepare(
     "SELECT * FROM $documents_table WHERE user_id = %d ORDER BY upload_date DESC",
     $student_id
@@ -278,7 +294,46 @@ $college_prep_items = array(
                 <?php endif; ?>
             </div>
         </div>
-    </div>
+        
+        <!-- Waiver Status Management -->
+        <div class="detail-card">
+            <div class="detail-card-header">
+                📋 Participant Waiver Status
+            </div>
+            <div class="detail-card-content">
+                <div style="margin-bottom: 16px;">
+                    <strong>Current Status:</strong>
+                    <span class="status-badge status-<?php echo esc_attr($student->waiver_status ?? 'pending'); ?>">
+                        <?php echo ucfirst($student->waiver_status ?? 'pending'); ?>
+                    </span>
+                </div>
+                
+                <form method="post" style="margin-top: 16px;">
+                    <?php wp_nonce_field('update_waiver_status', 'waiver_nonce'); ?>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <select name="waiver_status" style="flex: 1;">
+                            <option value="pending" <?php selected($student->waiver_status ?? 'pending', 'pending'); ?>>Pending</option>
+                            <option value="form_delivered" <?php selected($student->waiver_status ?? 'pending', 'form_delivered'); ?>>Form Delivered</option>
+                            <option value="form_signed_received" <?php selected($student->waiver_status ?? 'pending', 'form_signed_received'); ?>>Form Signed and Received</option>
+                            <option value="form_not_returned" <?php selected($student->waiver_status ?? 'pending', 'form_not_returned'); ?>>Form Not Returned</option>
+                        </select>
+                        <button type="submit" name="update_waiver_status" class="button button-primary">
+                            Update Status
+                        </button>
+                    </div>
+                </form>
+                
+                <?php if (in_array($student->waiver_status ?? 'pending', ['pending', 'form_delivered', 'form_not_returned'])): ?>
+                    <p style="color: #d63638; font-size: 14px; margin-top: 12px;">
+                        ⚠️ Student will see waiver download alert until status is "Form Signed and Received"
+                    </p>
+                <?php else: ?>
+                    <p style="color: #00a32a; font-size: 14px; margin-top: 12px;">
+                        ✅ Waiver completed - alert hidden from student dashboard
+                    </p>
+                <?php endif; ?>
+            </div>
+        </div>    </div>
 
     <p>
         <a href="<?php echo admin_url('admin.php?page=tfsp-students'); ?>" class="button">

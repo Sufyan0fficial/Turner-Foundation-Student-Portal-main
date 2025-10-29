@@ -33,6 +33,7 @@ class TFSP_Database_Activator {
             classification varchar(20) DEFAULT NULL,
             shirt_size varchar(10) DEFAULT NULL,
             blazer_size varchar(10) DEFAULT NULL,
+            waiver_status varchar(20) DEFAULT 'pending',
             status varchar(20) DEFAULT 'active',
             enrollment_date datetime DEFAULT CURRENT_TIMESTAMP,
             last_activity datetime DEFAULT NULL,
@@ -342,6 +343,9 @@ class TFSP_Database_Activator {
 
         // Finalize: ensure schema matches latest (safe no-ops if already applied)
         self::maybe_migrate_attendance_schema();
+        
+        // Add waiver status field if it doesn't exist
+        self::maybe_add_waiver_status_field();
     }
     
     private static function insert_default_advisor_settings() {
@@ -499,6 +503,27 @@ class TFSP_Database_Activator {
             // Create .htaccess for security
             $htaccess_content = "Options -Indexes\n<Files *.php>\nDeny from all\n</Files>";
             file_put_contents($tfsp_upload_dir . '/.htaccess', $htaccess_content);
+        }
+    }
+    
+    /**
+     * Add waiver_status field to students table if it doesn't exist.
+     * Safe to run multiple times.
+     */
+    public static function maybe_add_waiver_status_field() {
+        global $wpdb;
+        
+        $students_table = $wpdb->prefix . 'tfsp_students';
+        
+        // Check if waiver_status column exists
+        $column_exists = $wpdb->get_results($wpdb->prepare(
+            "SHOW COLUMNS FROM $students_table LIKE %s",
+            'waiver_status'
+        ));
+        
+        if (empty($column_exists)) {
+            // Add the waiver_status column
+            $wpdb->query("ALTER TABLE $students_table ADD COLUMN waiver_status varchar(20) DEFAULT 'pending' AFTER blazer_size");
         }
     }
 }

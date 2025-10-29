@@ -594,6 +594,54 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
         </div>
     </div>
     
+    <!-- Participant Waiver Alert -->
+    <?php
+    // Get student waiver status
+    $waiver_status = $wpdb->get_var($wpdb->prepare("
+        SELECT waiver_status FROM {$wpdb->prefix}tfsp_students 
+        WHERE user_id = %d
+    ", $current_user->ID)) ?: 'pending';
+    
+    if ($waiver_status !== 'form_signed_received'): ?>
+        <div style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3); border: 3px solid #fca5a5; animation: pulse-alert 2s infinite;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
+                <div style="display: flex; align-items: center; gap: 16px;">
+                    <div style="font-size: 48px; animation: shake 1s infinite;">⚠️</div>
+                    <div>
+                        <h3 style="margin: 0 0 8px; font-size: 22px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">🚨 URGENT: Participant Waiver Required</h3>
+                        <p style="margin: 0; opacity: 0.95; font-size: 16px; font-weight: 500;">
+                            <strong>Action Required:</strong> Download, complete, and return your signed waiver form immediately to continue program participation.
+                        </p>
+                        <p style="margin: 8px 0 0; font-size: 14px; opacity: 0.9; font-style: italic;">
+                            ⏰ This form must be submitted before your next session
+                        </p>
+                    </div>
+                </div>
+                <a href="<?php echo plugins_url('assets/participant-waiver-form.pdf', dirname(__FILE__)); ?>" download class="btn" style="background: white; color: #dc2626; padding: 16px 28px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: 2px solid #fca5a5; animation: glow 1.5s infinite alternate; text-decoration: none; border-radius: 8px; white-space: nowrap;">
+                    📥 DOWNLOAD NOW
+                </a>
+            </div>
+        </div>
+        
+        <style>
+        @keyframes pulse-alert {
+            0%, 100% { box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3); }
+            50% { box-shadow: 0 8px 35px rgba(220, 38, 38, 0.6), 0 0 20px rgba(220, 38, 38, 0.4); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px) rotate(-1deg); }
+            75% { transform: translateX(2px) rotate(1deg); }
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+            100% { box-shadow: 0 4px 20px rgba(220, 38, 38, 0.5), 0 0 15px rgba(255, 255, 255, 0.3); }
+        }
+        </style>
+    <?php endif; ?>
+    
     <!-- Your Challenges -->
     <div class="section">
         <h2>🎯 Your Challenges</h2>
@@ -847,6 +895,7 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
                         <option value="essay">Personal Essay</option>
                         <option value="resume">Academic Resume</option>
                         <option value="recommendation">Recommendation Letter</option>
+                        <option value="waiver">Participant Waiver Form</option>
                         <option value="other">Other</option>
                     </select>
                     <button class="upload-btn" id="uploadBtn" onclick="uploadDocument()" disabled>Upload Document</button>
