@@ -602,7 +602,13 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
         WHERE user_id = %d
     ", $current_user->ID)) ?: 'pending';
     
-    if ($waiver_status !== 'form_signed_received'): ?>
+    // Check if student has uploaded waiver document
+    $waiver_uploaded = $wpdb->get_var($wpdb->prepare("
+        SELECT COUNT(*) FROM {$wpdb->prefix}tfsp_documents 
+        WHERE user_id = %d AND document_type = 'waiver'
+    ", $current_user->ID));
+    
+    if ($waiver_status !== 'form_signed_received' && !$waiver_uploaded): ?>
         <div style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; padding: 24px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 8px 25px rgba(220, 38, 38, 0.3); border: 3px solid #fca5a5; animation: pulse-alert 2s infinite;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 20px;">
                 <div style="display: flex; align-items: center; gap: 16px;">
