@@ -75,7 +75,6 @@ function render_attendance_tracking() {
                                             <option value="">-</option>
                                             <option value="present" <?php selected($attendance, 'present'); ?>>✅ Present</option>
                                             <option value="excused" <?php selected($attendance, 'excused'); ?>>📋 Excused</option>
-                                            <option value="absent" <?php selected($attendance, 'absent'); ?>>❌ Didn't Attend</option>
                                             <option value="postponed" <?php selected($attendance, 'postponed'); ?>>⏰ Postponed</option>
                                         </select>
                                     </td>

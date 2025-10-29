@@ -291,7 +291,6 @@ $student_progress = $wpdb->get_results("
             <option value="no_show" <?php selected($filter_status, 'no_show'); ?>>No-Show</option>
             <option value="rescheduled" <?php selected($filter_status, 'rescheduled'); ?>>Rescheduled</option>
             <option value="excused" <?php selected($filter_status, 'excused'); ?>>Excused</option>
-            <option value="didnt_attend" <?php selected($filter_status, 'didnt_attend'); ?>>Didn't Attend</option>
         </select>
     </div>
     
@@ -370,7 +369,6 @@ $student_progress = $wpdb->get_results("
                     <option value="no_show">No-Show</option>
                     <option value="rescheduled">Rescheduled</option>
                     <option value="excused">Excused</option>
-                    <option value="didnt_attend">Didn't Attend</option>
                 </select>
             </div>
             

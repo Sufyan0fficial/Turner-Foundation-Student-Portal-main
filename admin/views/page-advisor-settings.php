@@ -117,7 +117,7 @@ $upcoming_sessions = $wpdb->get_results("SELECT * FROM $sessions_table WHERE is_
 <?php endif; ?>
 
 <div class="settings-form">
-    <h2>Advisor Section Settings</h2>
+    <h2>One-on-one Coaching Sessions Settings</h2>
     <form method="post">
         <?php wp_nonce_field('manage_advisor', 'advisor_nonce'); ?>
         <input type="hidden" name="action" value="update_settings">

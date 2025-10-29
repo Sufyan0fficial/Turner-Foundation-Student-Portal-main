@@ -51,7 +51,6 @@ class TFSP_Attendance_Tracker {
                                             <option value="">-</option>
                                             <option value="present">Present</option>
                                             <option value="excused">Excused</option>
-                                            <option value="absent">Didn't Attend</option>
                                             <option value="postponed">Postponed</option>
                                         </select>
                                     </td>
