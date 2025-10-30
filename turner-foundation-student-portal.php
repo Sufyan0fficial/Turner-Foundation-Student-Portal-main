@@ -664,7 +664,8 @@ class TurnerFoundationStudentPortal {
 
     public function student_dashboard_shortcode($atts) {
         if (!is_user_logged_in()) {
-            return '<div style="padding: 20px; background: #fff3cd; border-radius: 8px; text-align: center;"><p>Please <a href="' . wp_login_url() . '">login</a> to access your dashboard.</p></div>';
+            echo '<script>window.location.href = "' . home_url('/student-login/') . '";</script>';
+            return;
         }
 
         // Enqueue the CSS for student dashboard
