@@ -213,7 +213,7 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
             max-width: 700px;
             height: 85vh;
             max-height: 700px;
-            overflow: hidden;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
         }
@@ -308,7 +308,7 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
             display: flex;
             flex-direction: column;
             flex: 1;
-            min-height: 500px;
+            min-height: 300px;
         }
         .message-history {
             flex: 1;
@@ -836,7 +836,61 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
             .advisor-section, .resources-grid { grid-template-columns: 1fr; }
             .roadmap-grid, .challenges-grid { grid-template-columns: 1fr; }
         }
-    </style>
+        
+        /* Avatar Styles */
+        .coach-avatar, .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .coach-avatar:hover, .admin-avatar:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Image Dialog Styles */
+        .image-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .image-dialog-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .image-dialog-content img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+        }
+        .close-image-dialog {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }    </style>
 </head>
 <body>
 
@@ -878,7 +932,7 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
             
             <!-- Coach Message Form -->
             <form id="coachMessageForm" class="message-form active">
-                <div class="form-group">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../assets/images/Kimberly Prof Headshot.jpg'; ?>" alt="Kimberly Shackelford" class="coach-avatar" onclick="showImageDialog(this.src, this.alt)">                <div class="form-group">
                     <label>Subject:</label>
                     <input type="text" id="coachSubject" required placeholder="Enter message subject">
                 </div>
@@ -893,7 +947,7 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
             
             <!-- Admin Message Form -->
             <form id="adminMessageForm" class="message-form">
-                <div class="chat-container">
+                <img src="<?php echo plugin_dir_url(__FILE__) . '../assets/images/Chaslyn Piper Image.jpeg'; ?>" alt="Chaslyn Piper" class="admin-avatar" onclick="showImageDialog(this.src, this.alt)">                <div class="chat-container">
                     <div class="message-history" id="adminMessageHistory">
                         <!-- Messages will be loaded here -->
                     </div>
@@ -905,7 +959,13 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
             </form>
         </div>
     </div>
-
+    <!-- Image Dialog -->
+    <div id="imageDialog" class="image-dialog" style="display: none;" onclick="closeImageDialog()">
+        <div class="image-dialog-content">
+            <img id="dialogImage" src="" alt="">
+            <button class="close-image-dialog" onclick="closeImageDialog()">✕</button>
+        </div>
+    </div>
 <div class="container">
     <!-- Welcome Section -->
     <div class="welcome-section">
@@ -2659,53 +2719,6 @@ function switchTab(tab) {
     }
 }
 
-function loadAdminMessages() {
-    const historyDiv = document.getElementById('messageHistory');
-    historyDiv.innerHTML = '<div class="loading">Loading messages...</div>';
-    
-    fetch(ajaxurl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-            action: 'tfsp_get_messages',
-            nonce: '<?php echo wp_create_nonce('tfsp_nonce'); ?>'
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            displayMessages(data.data);
-        } else {
-            historyDiv.innerHTML = '<div class="loading">No messages yet. Start a conversation!</div>';
-        }
-    });
-}
-
-function displayMessages(messages) {
-    const historyDiv = document.getElementById('messageHistory');
-    
-    if (messages.length === 0) {
-        historyDiv.innerHTML = '<div class="loading">No messages yet. Start a conversation!</div>';
-        return;
-    }
-    
-    let html = '';
-    messages.forEach(msg => {
-        const isAdmin = msg.sender_type === 'admin';
-        html += `
-            <div class="message-item ${isAdmin ? 'admin' : ''}">
-                <div class="message-meta">
-                    <strong>${isAdmin ? 'Program Admin' : 'You'}</strong> - ${msg.created_at}
-                </div>
-                <div class="message-text">${msg.message}</div>
-            </div>
-        `;
-    });
-    
-    historyDiv.innerHTML = html;
-    historyDiv.scrollTop = historyDiv.scrollHeight;
-}
-
 // Handle coach message form submission
 document.getElementById('coachMessageForm').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -2775,9 +2788,26 @@ document.getElementById('adminMessageForm').addEventListener('submit', function(
 // Toggle chat modal
 function toggleChat() {
     const modal = document.getElementById('chatModal');
-    modal.style.display = modal.style.display === 'none' ? 'flex' : 'none';
+    const isOpening = modal.style.display === 'none';
+    modal.style.display = isOpening ? 'flex' : 'none';
+    
+    // Load admin messages if opening modal and admin form is active
+    if (isOpening && document.getElementById('adminMessageForm').classList.contains('active')) {
+        loadAdminMessages();
+    }
+}
+// Image dialog functions
+function showImageDialog(src, alt) {
+    const dialog = document.getElementById('imageDialog');
+    const img = document.getElementById('dialogImage');
+    img.src = src;
+    img.alt = alt;
+    dialog.style.display = 'flex';
 }
 
+function closeImageDialog() {
+    document.getElementById('imageDialog').style.display = 'none';
+}
 // Switch between message types
 function switchMessageType(type) {
     // Update buttons
