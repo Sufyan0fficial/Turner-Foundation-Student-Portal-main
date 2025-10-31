@@ -18,6 +18,36 @@ function render_student_drill_down($student_id) {
         $student_id
     ));
     
+    // If no student record exists, create one
+    if (!$student_info) {
+        // First ensure cohort_year field exists
+        $cohort_field = $wpdb->get_var("SHOW COLUMNS FROM {$wpdb->prefix}tfsp_students LIKE 'cohort_year'");
+        if (!$cohort_field) {
+            $wpdb->query("ALTER TABLE {$wpdb->prefix}tfsp_students ADD COLUMN cohort_year varchar(50) DEFAULT NULL AFTER classification");
+        }
+        
+        // Create student record
+        $student_id_code = 'S' . str_pad((string)$student_id, 6, '0', STR_PAD_LEFT);
+        $wpdb->insert(
+            $wpdb->prefix . 'tfsp_students',
+            array(
+                'user_id' => $student_id,
+                'student_id' => $student_id_code,
+                'first_name' => $student->first_name,
+                'last_name' => $student->last_name,
+                'email' => $student->user_email,
+                'status' => 'active',
+                'created_at' => current_time('mysql')
+            ),
+            array('%d','%s','%s','%s','%s','%s','%s')
+        );
+        
+        // Fetch the newly created record
+        $student_info = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}tfsp_students WHERE user_id = %d",
+            $student_id
+        ));
+    }    
     // Get progress
     $progress = $wpdb->get_results($wpdb->prepare(
         "SELECT * FROM {$wpdb->prefix}tfsp_student_progress WHERE student_id = %d",
@@ -330,7 +360,13 @@ function render_student_drill_down($student_id) {
                 Grade level
             </p>
         </div>
-        <?php endif; ?>
+        <div class="stat-card">
+            <h4>Cohort Year</h4>
+            <div class="number" style="font-size: 16px;"><?php echo $student_info->cohort_year ?? 'Not Set'; ?></div>
+            <p style="margin: 8px 0 0; font-size: 13px; color: #6b7280;">
+                Program cohort
+            </p>
+        </div>        <?php endif; ?>
     </div>
     
     <?php if ($student_info): ?>
@@ -349,6 +385,10 @@ function render_student_drill_down($student_id) {
                 <p style="margin: 0;"><strong>Phone:</strong> <?php echo esc_html($student_info->parent_phone ?? 'N/A'); ?></p>
             </div>
             <div>
+                <h4 style="margin: 0 0 8px; font-size: 13px; color: #6b7280; text-transform: uppercase;">Academic Info</h4>
+                <p style="margin: 0 0 4px;"><strong>Classification:</strong> <?php echo ucfirst($student_info->classification ?? 'N/A'); ?></p>
+                <p style="margin: 0;"><strong>Cohort Year:</strong> <?php echo esc_html($student_info->cohort_year ?? 'Not Set'); ?></p>
+            </div>            <div>
                 <h4 style="margin: 0 0 8px; font-size: 13px; color: #6b7280; text-transform: uppercase;">Apparel Sizes</h4>
                 <p style="margin: 0 0 4px;"><strong>Shirt:</strong> <?php echo esc_html($student_info->shirt_size ?? 'N/A'); ?></p>
                 <p style="margin: 0;"><strong>Blazer:</strong> <?php echo esc_html($student_info->blazer_size ?? 'N/A'); ?></p>

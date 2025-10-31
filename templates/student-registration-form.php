@@ -72,6 +72,14 @@ if (is_user_logged_in()) {
                     </select>
                 </div>
                 <div class="tfsp-form-group">
+                    <label class="tfsp-label">Cohort Year</label>
+                    <select name="cohort_year" class="tfsp-input" required>
+                        <option value="">Select Cohort</option>
+                        <option value="Group One, 2025 to 2026">Group One, 2025 to 2026</option>
+                        <option value="Group Two, 2026 to 2027">Group Two, 2026 to 2027</option>
+                        <option value="Group Three, 2027 to 2028">Group Three, 2027 to 2028</option>
+                    </select>
+                </div>                <div class="tfsp-form-group">
                     <label class="tfsp-label">Polo Shirt Size</label>
                     <select name="shirt_size" class="tfsp-input" required>
                         <option value="">Select Size</option>

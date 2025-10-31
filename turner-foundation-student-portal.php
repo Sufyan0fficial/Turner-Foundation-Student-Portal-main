@@ -716,6 +716,7 @@ class TurnerFoundationStudentPortal {
     public function activate() {
         require_once TFSP_PLUGIN_PATH . 'includes/class-database-activator.php';
         TFSP_Database_Activator::activate();
+        TFSP_Database_Activator::maybe_add_cohort_year_field();
         $this->create_plugin_pages();
         flush_rewrite_rules();
     }

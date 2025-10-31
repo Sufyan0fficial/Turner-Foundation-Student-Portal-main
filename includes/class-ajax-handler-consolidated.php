@@ -60,6 +60,7 @@ class TFSP_Ajax_Handler {
         $parent_email = sanitize_email($_POST['parent_email']);
         $parent_phone = sanitize_text_field($_POST['parent_phone']);
         $classification = sanitize_text_field($_POST['classification']);
+        $cohort_year = sanitize_text_field($_POST['cohort_year']);
         $shirt_size = sanitize_text_field($_POST['shirt_size']);
         $blazer_size = sanitize_text_field($_POST['blazer_size']);
         
@@ -112,12 +113,13 @@ class TFSP_Ajax_Handler {
                     'parent_email' => $parent_email,
                     'parent_phone' => $parent_phone,
                     'classification' => $classification,
+                    'cohort_year' => $cohort_year,
                     'shirt_size' => $shirt_size,
                     'blazer_size' => $blazer_size,
                     'status' => 'active',
                     'created_at' => current_time('mysql')
                 ),
-                array('%d','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')
+                array('%d','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s','%s')
             );
         }
         

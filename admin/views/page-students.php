@@ -350,6 +350,18 @@ if ($student_id) {
 // Show students list if no specific student selected
 $students = get_users(array('role' => 'subscriber'));
 global $wpdb;
+
+// Get additional student data from tfsp_students table
+$student_data = array();
+if (!empty($students)) {
+    $user_ids = array_map(function($user) { return $user->ID; }, $students);
+    $placeholders = implode(',', array_fill(0, count($user_ids), '%d'));
+    $student_records = $wpdb->get_results($wpdb->prepare(
+        "SELECT user_id, classification, cohort_year FROM {$wpdb->prefix}tfsp_students WHERE user_id IN ($placeholders)",
+        ...$user_ids
+    ), OBJECT_K);
+    $student_data = $student_records;
+}
 ?>
 
 <div class="section">
@@ -366,6 +378,7 @@ global $wpdb;
                 <tr>
                     <th>Student Name</th>
                     <th>Email</th>
+                    <th>Cohort Year</th>
                     <th>Registration Date</th>
                     <th>Progress</th>
                     <th>Attendance</th>
@@ -388,10 +401,14 @@ global $wpdb;
                         $student->ID
                     ));
                     $attendance = $attendance_records > 0 ? round(($present_records / $attendance_records) * 100) : 0;
+                    
+                    // Get cohort year
+                    $cohort_year = isset($student_data[$student->ID]) ? $student_data[$student->ID]->cohort_year : 'Not Set';
                     ?>
                     <tr>
                         <td data-label="Student Name"><strong><?php echo esc_html($student->display_name); ?></strong></td>
                         <td data-label="Email"><?php echo esc_html($student->user_email); ?></td>
+                        <td data-label="Cohort Year"><?php echo esc_html($cohort_year); ?></td>
                         <td data-label="Registration Date"><?php echo date('M j, Y', strtotime($student->user_registered)); ?></td>
                         <td data-label="Progress">
                             <div style="background: #f3f4f6; border-radius: 10px; height: 8px; overflow: hidden;">

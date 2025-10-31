@@ -31,6 +31,7 @@ class TFSP_Database_Activator {
             emergency_contact varchar(100) DEFAULT NULL,
             emergency_phone varchar(20) DEFAULT NULL,
             classification varchar(20) DEFAULT NULL,
+            cohort_year varchar(50) DEFAULT NULL,
             shirt_size varchar(10) DEFAULT NULL,
             blazer_size varchar(10) DEFAULT NULL,
             waiver_status varchar(20) DEFAULT 'pending',
@@ -507,23 +508,23 @@ class TFSP_Database_Activator {
     }
     
     /**
-     * Add waiver_status field to students table if it doesn't exist.
+     * Add cohort_year field to students table if it doesn't exist.
      * Safe to run multiple times.
      */
-    public static function maybe_add_waiver_status_field() {
+    public static function maybe_add_cohort_year_field() {
         global $wpdb;
         
         $students_table = $wpdb->prefix . 'tfsp_students';
         
-        // Check if waiver_status column exists
+        // Check if cohort_year column exists
         $column_exists = $wpdb->get_results($wpdb->prepare(
             "SHOW COLUMNS FROM $students_table LIKE %s",
-            'waiver_status'
+            'cohort_year'
         ));
         
         if (empty($column_exists)) {
-            // Add the waiver_status column
-            $wpdb->query("ALTER TABLE $students_table ADD COLUMN waiver_status varchar(20) DEFAULT 'pending' AFTER blazer_size");
+            // Add the cohort_year column
+            $wpdb->query("ALTER TABLE $students_table ADD COLUMN cohort_year varchar(50) DEFAULT NULL AFTER classification");
         }
     }
 }
