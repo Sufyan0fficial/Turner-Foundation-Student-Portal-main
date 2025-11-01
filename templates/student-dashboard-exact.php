@@ -877,20 +877,30 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
             border-radius: 8px;
         }
         .close-image-dialog {
+            padding:4px 6px;
             position: absolute;
-            top: -10px;
-            right: -10px;
-            background: white;
-            border: none;
+            top: -15px;
+            right: -15px;
+            background: #fff;
+            border: 2px solid #ddd;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            /* width: 35px;
+            height: 35px; */
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
             display: flex;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
+            align-items: center ;
+            justify-content: center ;
+            /* line-height: 1; */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+        .close-image-dialog:hover {
+            background: #f5f5f5;
+            border-color: #999;
+            transform: scale(1.1);
         }    </style>
 </head>
 <body>
@@ -933,7 +943,14 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
             
             <!-- Coach Message Form -->
             <form id="coachMessageForm" class="message-form active">
-                <img src="<?php echo plugin_dir_url(__FILE__) . '../assets/images/Kimberly Prof Headshot.jpg'; ?>" alt="Kimberly Shackelford" class="coach-avatar" onclick="showImageDialog(this.src, this.alt)">                <div class="form-group">
+                <div style="display: flex; align-items: start; margin-bottom: 15px;">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../assets/images/Kimberly Prof Headshot.jpg'; ?>" alt="Kimberly Shackelford" class="coach-avatar" onclick="showImageDialog(this.src, this.alt)" style="margin-right: 15px;">
+                    <div>
+                        <h4 style="margin: 0px !important; color: #333; line-height: 1.2;">College and Career Coach</h4>
+                        <p style="margin: 2px 0 0 0; color: #666; font-size: 14px;">(Kimberly Shackelford)</p>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label>Subject:</label>
                     <input type="text" id="coachSubject" required placeholder="Enter message subject">
                 </div>
@@ -948,7 +965,14 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
             
             <!-- Admin Message Form -->
             <form id="adminMessageForm" class="message-form">
-                <img src="<?php echo plugin_dir_url(__FILE__) . '../assets/images/Chaslyn Piper Image.jpeg'; ?>" alt="Chaslyn Piper" class="admin-avatar" onclick="showImageDialog(this.src, this.alt)">                <div class="chat-container">
+                <div style="display: flex; align-items: start; margin-bottom: 15px;">
+                    <img src="<?php echo plugin_dir_url(__FILE__) . '../assets/images/Chaslyn Piper Image.jpeg'; ?>" alt="Chaslyn Piper" class="admin-avatar" onclick="showImageDialog(this.src, this.alt)" style="margin-right: 15px;">
+                    <div style=' display:flex; flex-direction:column; gap:0px !important'>
+                        <h4 style="margin: 0px !important; color: #333;">Program Coordinator</h4>
+                        <p style="margin: 0px 0 0 0; color: #666; font-size: 14px;">(Chaslyn Piper)</p>
+                    </div>
+                </div>
+                <div class="chat-container">
                     <div class="message-history" id="adminMessageHistory">
                         <!-- Messages will be loaded here -->
                     </div>
