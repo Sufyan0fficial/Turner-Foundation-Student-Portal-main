@@ -18,6 +18,7 @@ if (isset($_POST['send_coach_message']) && wp_verify_nonce($_POST['coach_nonce']
     $wpdb->insert(
         $wpdb->prefix . 'tfsp_messages',
         array(
+            'student_id' => $user->ID,
             'sender_id' => $user->ID,
             'message_type' => 'coach',
             'subject' => '[Coach] ' . $subject,
@@ -26,7 +27,7 @@ if (isset($_POST['send_coach_message']) && wp_verify_nonce($_POST['coach_nonce']
             'status' => 'unread',
             'created_at' => current_time('mysql')
         ),
-        array('%d', '%s', '%s', '%s', '%s', '%s', '%s')
+        array('%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s')
     );
     
     // Try to send email (optional)
@@ -1610,7 +1611,6 @@ $progress_percentage = count($roadmap_steps) > 0 ? round((count($completed_steps
 const ajaxurl = '<?php echo admin_url('admin-ajax.php'); ?>';
 
 function updateStatus(stepKey, status) {
-    console.log('Updating status:', stepKey, status); // Debug
     
     if (!window.jQuery) {
         alert('jQuery not loaded. Please refresh the page.');
@@ -1654,7 +1654,6 @@ function updateStatus(stepKey, status) {
             nonce: '<?php echo wp_create_nonce('roadmap_nonce'); ?>'
         },
         success: function(response) {
-            console.log('Response:', response); // Debug
             if (response.success) {
                 setTimeout(() => location.reload(), 500);
             } else {
@@ -1873,7 +1872,6 @@ function uploadDocument() {
         },
         error: function(xhr, status, error) {
             clearInterval(progressInterval);
-            console.log('Upload error:', xhr.responseText); // Debug
             
             if (status === 'timeout') {
                 alert('❌ Upload timed out. Please try again with a smaller file.');
@@ -2015,7 +2013,6 @@ function saveRoadmapField(stepKey, fieldName, value, inputElement) {
             nonce: '<?php echo wp_create_nonce('save_roadmap_field'); ?>'
         })
     })
-    .then(response => response.json())
     .then(data => {
         if (data.success && inputElement) {
             // Show success indicator
@@ -2775,25 +2772,30 @@ document.getElementById('adminMessageForm').addEventListener('submit', function(
             nonce: '<?php echo wp_create_nonce('tfsp_nonce'); ?>'
         })
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(response => response.json()).then(data => {
         if (data.success) {
             document.getElementById('adminMessage').value = '';
             loadAdminMessages(); // Refresh messages
         } else {
             alert('Error sending message: ' + data.data);
         }
+    })
+    .catch(error => {
+        console.error("Network error:", error);
+        alert("Error sending message: Network error");
     });
 });
 // Toggle chat modal
 function toggleChat() {
-    const modal = document.getElementById('chatModal');
-    const isOpening = modal.style.display === 'none';
-    modal.style.display = isOpening ? 'flex' : 'none';
-    
-    // Load admin messages if opening modal and admin form is active
-    if (isOpening && document.getElementById('adminMessageForm').classList.contains('active')) {
-        loadAdminMessages();
+    const modal = document.getElementById("chatModal");
+    if (modal) {
+        const isHidden = modal.style.display === "none" || modal.style.display === "";
+        modal.style.display = isHidden ? "flex" : "none";
+        
+        // Load admin messages if opening modal and admin form is active
+        if (isHidden && document.getElementById('adminMessageForm') && document.getElementById('adminMessageForm').classList.contains('active')) {
+            loadAdminMessages();
+        }
     }
 }
 // Image dialog functions
@@ -2834,8 +2836,7 @@ function loadAdminMessages() {
             nonce: '<?php echo wp_create_nonce('tfsp_nonce'); ?>'
         })
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(response => response.json()).then(data => {
         if (data.success) {
             displayAdminMessages(data.data);
         } else {

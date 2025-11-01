@@ -119,6 +119,7 @@ class TFSP_Complete_Ajax_Handler {
         global $wpdb;
         $result = $wpdb->insert($wpdb->prefix . 'tfsp_messages', array(
             'student_id' => $user_id,
+            'sender_id' => $user_id,
             'message_type' => $message_type,
             'subject' => $subject,
             'message' => $message,

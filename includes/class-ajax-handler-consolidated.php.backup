@@ -40,7 +40,6 @@ class TFSP_Ajax_Handler {
         add_action('wp_ajax_tfsp_get_conversation', array($this, 'get_conversation'));
         add_action('wp_ajax_tfsp_send_admin_reply', array($this, 'send_admin_reply'));
         add_action('wp_ajax_tfsp_update_student_progress', array($this, 'update_student_progress_admin'));
-        // Add nopriv actions for student users        add_action("wp_ajax_nopriv_tfsp_send_coach_message", array($this, "send_coach_message"));        add_action("wp_ajax_nopriv_tfsp_send_admin_message", array($this, "send_admin_message"));        add_action("wp_ajax_nopriv_tfsp_get_admin_messages", array($this, "get_admin_messages"));
         
         // Admin actions
         add_action('wp_ajax_tfsp_get_admin_stats', array($this, 'get_admin_stats'));
@@ -1265,23 +1264,24 @@ class TFSP_Ajax_Handler {
         $user_id = get_current_user_id();
         global $wpdb;
         
-        // Use same query as admin side but for current user
+        // Get ALL messages for this student's conversation with admin
         $messages = $wpdb->get_results($wpdb->prepare(
-            "SELECT *, DATE_FORMAT(created_at, '%%M %%d, %%Y %%h:%%i %%p') as formatted_date
+            "SELECT *, 
+                    CASE 
+                        WHEN sender_id = %d THEN 'student'
+                        WHEN message_type = 'admin' AND sender_id IS NULL THEN 'admin'
+                        WHEN sender_id != %d THEN 'admin'
+                        ELSE 'student'
+                    END as sender_type,
+                    DATE_FORMAT(created_at, '%%M %%d, %%Y %%h:%%i %%p') as formatted_date
              FROM {$wpdb->prefix}tfsp_messages 
-             WHERE student_id = %d AND message_type = 'admin' 
+             WHERE student_id = %d 
+             AND (message_type = 'admin' OR message_type IS NULL)
              ORDER BY created_at ASC",
-            $user_id
+            $user_id, $user_id, $user_id
         ));
         
-        // Add sender_type for display
-        if ($messages) {
-            foreach ($messages as $msg) {
-                $msg->sender_type = ($msg->sender_id == $user_id) ? 'student' : 'admin';
-            }
-        }
-        
-        wp_send_json_success($messages ? $messages : array());
+        wp_send_json_success($messages);
     }    
     public function get_conversation() {
         if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
@@ -1325,41 +1325,35 @@ class TFSP_Ajax_Handler {
             'messages' => $messages
         ));
     }
+    
     public function send_admin_reply() {
-        if (!wp_verify_nonce($_POST["nonce"], "tfsp_admin_nonce")) {
-            wp_send_json_error("Security check failed");
+        if (!wp_verify_nonce($_POST['nonce'], 'tfsp_admin_nonce')) {
+            wp_send_json_error('Security check failed');
         }
         
-        if (!current_user_can("manage_options")) {
-            wp_send_json_error("Access denied");
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Access denied');
         }
         
-        $student_id = intval($_POST["student_id"]);
-        $message = sanitize_textarea_field($_POST["message"]);
-        
-        // Force admin ID to be 1 (or get actual admin ID)
-        $admin_id = 1; // Use admin user ID 1, or get_current_user_id() if admin is logged in
+        $student_id = intval($_POST['student_id']);
+        $message = sanitize_textarea_field($_POST['message']);
         
         global $wpdb;
         $result = $wpdb->insert(
-            $wpdb->prefix . "tfsp_messages",
+            $wpdb->prefix . 'tfsp_messages',
             array(
-                "student_id" => $student_id,
-                "sender_id" => $admin_id,  // Make sure this is admin ID, not student ID
-                "message_type" => "admin",
-                "subject" => "Admin Reply",
-                "message" => $message,
-                "priority" => "normal",
-                "status" => "sent",
-                "created_at" => current_time("mysql")
+                'student_id' => $student_id,
+                'message_type' => 'admin',
+                'message' => $message,
+                'status' => 'sent'
             ),
-            array("%d", "%d", "%s", "%s", "%s", "%s", "%s", "%s")
+            array('%d', '%s', '%s', '%s', '%s')
         );
         
         if ($result) {
-            wp_send_json_success("Reply sent successfully");
+            wp_send_json_success('Reply sent');
         } else {
-            wp_send_json_error("Failed to send reply");
+            wp_send_json_error('Failed to send reply');
         }
     }
     

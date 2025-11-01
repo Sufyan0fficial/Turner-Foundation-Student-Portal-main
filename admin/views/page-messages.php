@@ -206,19 +206,22 @@ $coach_messages = $wpdb->get_results(
 if (isset($_POST['send_admin_reply']) && wp_verify_nonce($_POST['nonce'], 'send_admin_message')) {
     $recipient_id = intval($_POST['recipient_id']);
     $message = sanitize_textarea_field($_POST['message']);
-    $sender_id = get_current_user_id();
+    $sender_id = 1; // Force admin ID to be 1
     
     $wpdb->insert(
         $wpdb->prefix . 'tfsp_messages',
         array(
             'sender_id' => $sender_id,
+            'student_id' => $recipient_id,
             'recipient_id' => $recipient_id,
+            'message_type' => 'admin',
             'subject' => 'Admin Reply',
             'message' => $message,
-            'status' => 'unread',
+            'priority' => 'normal',
+            'status' => 'sent',
             'created_at' => current_time('mysql')
         ),
-        array('%d', '%d', '%s', '%s', '%s', '%s')
+        array('%d', '%d', '%d', '%s', '%s', '%s', '%s', '%s', '%s')
     );
     
     echo '<script>window.location.href = "?view=messages&student_id=' . $recipient_id . '";</script>';
